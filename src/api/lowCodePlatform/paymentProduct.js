@@ -135,3 +135,36 @@ export const getApplicationSystemDetail = (data) => {
   const sceneList = mockSceneList[data.ids] || []
   return mockSimple({ result: sceneList })
 }
+
+/* ==================== 业务节点流程设计（原 applicationAdd.vue 三接口） ==================== */
+
+// 业务节点列表（原 GET /business/node/listFroType → res.result 作为左侧「业务节点」面板数据）
+const mockBusinessNodes = [
+  { code: 'BN001', name: '实名认证节点', nodeType: 'service' },
+  { code: 'BN002', name: '风控检查节点', nodeType: 'service' },
+  { code: 'BN003', name: '账务处理节点', nodeType: 'service' }
+]
+export const getBusinessNodeListFroType = () =>
+  mockResponse(mockBusinessNodes, mockBusinessNodes.length)
+
+// 流程数据（原 ajaxGetFlowData：GET /flow/manage/config/getFlowData/{flowId} → res.result 即 flowDataInfo）
+export const getApplicationFlowData = (data) => {
+  const flowId = data?.flowId || ''
+  return mockSimple({
+    result: {
+      flowInfo: { id: flowId, name: '业务节点流程', code: flowId, status: 'DRAFT' },
+      nodeList: [
+        { id: 'start_1', type: 'start', name: '开始', top: 80, left: 200, width: 80, height: 60 },
+        { id: 'task_1', type: 'auto', name: '业务处理', top: 220, left: 200, width: 120, height: 60 },
+        { id: 'end_1', type: 'end', name: '结束', top: 360, left: 200, width: 80, height: 60 }
+      ],
+      linkList: [
+        { id: 'link_1', sourceId: 'start_1', targetId: 'task_1', text: '' },
+        { id: 'link_2', sourceId: 'task_1', targetId: 'end_1', text: '' }
+      ]
+    }
+  })
+}
+
+// 流程保存（原 POST /flow/design/config/save，payload = 设计器 JSON + epfFlowId）
+export const saveFlowDesign = (data) => mockSimple({ resultMsg: '保存成功' })

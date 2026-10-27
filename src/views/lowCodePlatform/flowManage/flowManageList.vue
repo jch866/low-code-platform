@@ -146,19 +146,8 @@
               </ep-radio-group>
             </ep-form-item>
             <ep-form-item prop="transCode" label="所属业务模块">
-              <!-- 原组件: JSelectService（业务模块多选），待迁移，暂用多选下拉占位（选项联调后接入） -->
-              <ep-select
-                v-model="state.form.transCode"
-                placeholder="请选择"
-                :multiple="true"
-              >
-                <ep-option
-                  v-for="item in state.serviceOptions"
-                  :key="item.lemmaItem"
-                  :label="item.itemName"
-                  :value="item.lemmaItem"
-                />
-              </ep-select>
+              <!-- 已迁移：JSelectService（业务模块多选，原 :multi="true"）；v-model=逗号拼接的业务树节点 key（与源 v-decorator=['transCode'] 一致） -->
+              <JSelectService v-model="state.form.transCode" :multi="true" />
             </ep-form-item>
             <ep-form-item
               prop="epfFlowType"
@@ -184,15 +173,8 @@
               </div>
             </ep-form-item>
             <ep-form-item prop="parentFlowId" label="所属流程">
-              <!-- 原组件: JSelectFlow（流程选择器），待迁移，暂用下拉占位（选项联调后接入） -->
-              <ep-select v-model="state.form.parentFlowId" placeholder="请选择">
-                <ep-option
-                  v-for="item in state.parentFlowOptions"
-                  :key="item.lemmaItem"
-                  :label="item.itemName"
-                  :value="item.lemmaItem"
-                />
-              </ep-select>
+              <!-- 已迁移：JSelectFlow（流程选择器，原 :multiple="false"）；v-model=epfFlowCode（源 returnId=false 时 valueKey 取 returnKeys[1]，parentFlowId 实存流程编码） -->
+              <JSelectFlow v-model="state.form.parentFlowId" :multiple="false" />
             </ep-form-item>
             <ep-form-item prop="epfFlowState" label="流程状态">
               <ep-radio-group v-model="state.form.epfFlowState">
@@ -367,6 +349,8 @@ import {
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
 import FlowDesigner from '@/components/flowDesigner/FlowDesigner.vue'
+import JSelectService from '@/components/jSelectService/JSelectService.vue'
+import JSelectFlow from '@/components/jSelectFlow/JSelectFlow.vue'
 
 const formRef = ref(null)
 const router = useRouter()
@@ -406,9 +390,6 @@ const state = reactive({
   createTimeRange: [],
   // 所属系统表字典选项（联调前为空）
   systemOptions,
-  // 业务模块/所属流程下拉选项（原组件 JSelectService / JSelectFlow，联调后接入，联调前为空）
-  serviceOptions: [],
-  parentFlowOptions: [],
   // 数据字典
   flowStateList: [],
   flowTypeList: [],

@@ -31,14 +31,9 @@
           <ep-option label="外部应用" value="outter" />
         </ep-select>
       </ep-form-item>
-      <!-- 原组件: JSelectProjectByDep（按部门选项目，ref=projectSelect, userOwn），待迁移；暂以禁用输入框占位 -->
+      <!-- 原组件: JSelectProjectByDep（按部门选项目，ref=projectSelect, userOwn），已迁移；v-model 为逗号拼接的 projectCode 串 -->
       <ep-form-item prop="projectCode" label="归属项目">
-        <ep-input
-          v-model="state.formModel.projectCode"
-          placeholder="原组件 JSelectProjectByDep，待迁移"
-          type="text"
-          disabled
-        />
+        <JSelectProjectByDep v-model="state.formModel.projectCode" />
       </ep-form-item>
     </SearchBlock>
     <!-- 列表区（原页面 9 列：#/应用编码/应用名称/应用类型/应用分类/归属项目/应用状态/应用负责人/操作） -->
@@ -233,19 +228,8 @@
       </template>
     </ep-dialog>
 
-    <!-- 业务节点流程设计占位（原组件: applicationAdd.vue（全屏流程设计 FlowDesignerApp），待迁移） -->
-    <ep-dialog
-      v-model="state.flowDialogVisible"
-      title="添加业务节点"
-      width="60%"
-    >
-      <div class="placeholder-block">
-        原组件 applicationAdd.vue（全屏流程设计），待迁移
-      </div>
-      <template #footer>
-        <ep-button plain @click="state.flowDialogVisible = false">关闭</ep-button>
-      </template>
-    </ep-dialog>
+    <!-- 业务节点流程设计（原组件: applicationAdd.vue 全屏流程设计，已迁移为 LogicFlow 版 FlowDesigner 包装） -->
+    <ApplicationAdd ref="applicationAddRef" @ok="onFlowSaved" />
 
     <!-- 删除 弹窗（原 a-popconfirm「确定要删除吗？」，接口 dynamic/table/data/delete） -->
     <ep-dialog
@@ -278,9 +262,14 @@ import {
 } from '@/api/lowCodePlatform/paymentProduct'
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
+import ApplicationAdd from './applicationAdd.vue'
+// 按部门选项目（原 develop/components/biz/JSelectProjectByDep，v-model 为逗号拼接的 projectCode）
+import JSelectProjectByDep from '@/components/jSelectProjectByDep/JSelectProjectByDep.vue'
 
 const formRef = ref(null)
 const sceneFormRef = ref(null)
+// 业务节点流程设计（applicationAdd 组件实例，暴露 add(id)/close()）
+const applicationAddRef = ref(null)
 
 const form = {
   applicationName: '',
@@ -398,8 +387,6 @@ const state = reactive({
   sceneTitle: '',
   sceneIndex: -1,
   sceneForm: { sceneName: '', sceneType: '' },
-  // 业务节点流程设计占位（原 applicationAdd.vue）
-  flowDialogVisible: false,
   // 删除
   dialogVisibleDel: false
 })
@@ -494,9 +481,14 @@ const deleteScene = (index) => {
   state.sceneList.splice(index, 1)
 }
 
-/** 业务节点配置（原 title=场景配置 时打开 applicationAdd 全屏流程设计，此处以占位弹窗保留入口） */
-const openFlowDesigner = () => {
-  state.flowDialogVisible = true
+/** 业务节点配置：打开全屏流程设计（原 add.vue 中打开 applicationAdd 传场景行 id） */
+const openFlowDesigner = (row) => {
+  applicationAddRef.value?.add(row.id || row.sceneId || '')
+}
+
+/** 业务节点流程保存成功回调（原 saveFlow 成功后关闭，此处刷新场景列表） */
+const onFlowSaved = () => {
+  if (state.id) initSceneList(state.id)
 }
 
 /** 取消 */

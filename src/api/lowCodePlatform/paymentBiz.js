@@ -3,8 +3,9 @@ import { mockResponse, mockSimple } from './common'
 /**
  * 支付业务 API（对应 Vue2 源页面 PayList.vue / PayListDisplay.vue 左树 + 右侧内容布局）
  * 真实接口地址（联调时替换 mock，字符串保持原样）：
- * - 交易树:   queryTransTreeList()                    （原 @api/api 聚合树接口）
- * - 树回显:   queryIdTree()                            （PayInfoModal 内上级交易树）
+ * - 交易树:   queryTransTreeList()                    （原 GET /product/payment/queryTransList，@api/api queryTransTreeList）
+ * - 树回显:   queryIdTree()                            （PayInfoModal 内上级交易树；源实际 import @/api/api queryIdTree → GET /sys/sysDepart/queryIdTree，
+ *                                                      另有 queryTransIdTree → GET /product/payment/queryIdTree 并存，mock 按交易树同源返回）
  * - 树搜索:   searchTransByKeywords({keyWord})         （左侧搜索框，placeholder=请输入交易名称）
  * - 新增:     /product/payment/add                     （PayInfoModal，恒为 POST 新增）
  * - 编辑:     /product/payment/edit                    （PUT，submitCurrForm 修改并保存）
@@ -25,6 +26,7 @@ const mockTreeList = [
     transCategory: '1',
     msgType: 'MSG001',
     description: '转账汇款类交易',
+    parentId: '',
     children: [
       {
         key: 'T001-01',
@@ -33,6 +35,7 @@ const mockTreeList = [
         transCategory: '2',
         msgType: 'MSG00101',
         description: '行内人民币转账',
+        parentId: 'T001',
         children: []
       },
       {
@@ -42,6 +45,7 @@ const mockTreeList = [
         transCategory: '2',
         msgType: 'MSG00102',
         description: '跨行大额/小额转账',
+        parentId: 'T001',
         children: []
       }
     ]
@@ -53,6 +57,7 @@ const mockTreeList = [
     transCategory: '1',
     msgType: 'MSG002',
     description: '生活缴费类交易',
+    parentId: '',
     children: [
       {
         key: 'T002-01',
@@ -61,6 +66,7 @@ const mockTreeList = [
         transCategory: '2',
         msgType: 'MSG00201',
         description: '公共事业缴费',
+        parentId: 'T002',
         children: []
       }
     ]
@@ -72,6 +78,7 @@ const mockTreeList = [
     transCategory: '1',
     msgType: 'MSG003',
     description: '账户查询类交易',
+    parentId: '',
     children: []
   }
 ]

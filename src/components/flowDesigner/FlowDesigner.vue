@@ -1,7 +1,7 @@
 <template>
   <div class="flow-designer">
     <!-- 左侧节点面板 -->
-    <NodePanel @node-click="onNodeClick" />
+    <NodePanel :extra-groups="commonNodeGroups" @node-click="onNodeClick" />
 
     <!-- 中间画布 -->
     <div class="canvas-area">
@@ -93,10 +93,27 @@ const props = defineProps({
   // 只读模式
   viewOnly: { type: Boolean, default: false },
   // 流程基本信息
-  flowInfo: { type: Object, default: () => ({}) }
+  flowInfo: { type: Object, default: () => ({}) },
+  // 业务节点列表（原设计器 commonFlows：左侧可拖公共节点，此处统一映射为自动任务节点展示于节点库末尾）
+  commonNodes: { type: Array, default: () => [] }
 })
 
 const emit = defineEmits(['save', 'flow-data-change', 'update:viewOnly'])
+
+// 业务节点 → 动态分组（原设计器按 basic-node-config 渲染专有节点类型，此处统一映射为自动任务节点）
+const commonNodeGroups = computed(() => {
+  if (!props.commonNodes || !props.commonNodes.length) return []
+  return [
+    {
+      title: '业务节点',
+      items: props.commonNodes.map((node) => ({
+        type: 'serviceTask',
+        label: node.name || node.nodeName || node.label || node.code || '业务节点',
+        color: '#722ed1'
+      }))
+    }
+  ]
+})
 
 const containerRef = ref(null)
 const fileInputRef = ref(null)
@@ -135,8 +152,15 @@ const initLogicFlow = () => {
     },
     edgeType: 'polyline',
     keyboard: { enabled: true },
+    // 注意：构造时必须非静默——LogicFlow 仅在构造时非静默才注册默认键盘快捷键（Delete 等），
+    // 只读模式在初始化完成后经 updateEditConfig 应用，保证只读→编辑切换后快捷键仍可用
     plugins: []
   })
+
+  // 应用初始只读模式（流程浏览等入口）
+  if (props.viewOnly) {
+    lf.updateEditConfig({ isSilentMode: true })
+  }
 
   // 节点点击
   lf.on('node:click', ({ data }) => {
@@ -356,11 +380,11 @@ const onClear = () => {
   emitDataChange()
 }
 
-// viewOnly 切换同步
+// viewOnly 切换同步（LogicFlow v2 无 setEditMode，须经 updateEditConfig 切换静默模式）
 watch(
   viewOnlyRef,
   (val) => {
-    if (lf) lf.setEditMode(val ? 'silent' : 'edit')
+    if (lf) lf.updateEditConfig({ isSilentMode: val })
     emit('update:viewOnly', val)
   }
 )

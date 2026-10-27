@@ -119,12 +119,13 @@
               <ep-input v-model="state.editForm.transName" placeholder="请输入交易名称" type="text" />
             </ep-form-item>
             <ep-form-item label="上级交易名称">
-              <!-- 原组件: a-tree-select（LC0347 上级交易名称，placeholder=无），待迁移 -->
-              <ep-input
-                :model-value="state.currentNode ? state.currentNode.title : ''"
-                placeholder="无"
-                type="text"
+              <!-- 已迁移：a-tree-select → TreeSelect 包装（LC0347 上级交易名称，placeholder=LC0386 无）；
+                   v-model=parentId（树节点 key）；源 disable 恒为 true，仅回显展示；树=queryTransTreeList（GET /product/payment/queryTransList） -->
+              <TreeSelect
+                v-model="state.editForm.parentId"
+                :tree-data="state.treeData"
                 disabled
+                placeholder="无"
               />
             </ep-form-item>
             <ep-form-item
@@ -201,12 +202,13 @@
         </ep-form-item>
         <!-- 原字段 :hidden="seen"：添加子交易/树右键添加时显示上级交易，根新增时隐藏 -->
         <ep-form-item v-if="!state.parentSeen" label="上级交易">
-          <!-- 原组件: a-tree-select（树=transTree from queryIdTree），待迁移 -->
-          <ep-input
-            :model-value="state.addForm.parentName"
-            placeholder="原组件 a-tree-select，待迁移"
-            type="text"
-            disabled
+          <!-- 已迁移：a-tree-select → TreeSelect 包装（树=transTree from queryIdTree，见 api/lowCodePlatform/paymentBiz.js 注释：
+               源 PayInfoModal 实际引用 @/api/api 的 queryIdTree → GET /sys/sysDepart/queryIdTree，与 /product/payment/queryIdTree 并存，
+               mock 按交易树同源返回）；v-model=parentId（树节点 key），placeholder=请选择+LC0388 上级交易 -->
+          <TreeSelect
+            v-model="state.addForm.parentId"
+            :tree-data="state.addTreeData"
+            placeholder="请选择上级交易"
           />
         </ep-form-item>
         <ep-form-item label="交易类型">
@@ -282,6 +284,7 @@ import {
   deleteByTransId,
   getPaymentDeleteBatch
 } from '@/api/lowCodePlatform/paymentBiz'
+import TreeSelect from '@/components/treeSelect/TreeSelect.vue'
 
 const treeRef = ref(null)
 const addFormRef = ref(null)
@@ -291,7 +294,6 @@ const addForm = {
   transName: '',
   transCode: '',
   parentId: '',
-  parentName: '',
   transCategory: '1',
   msgType: '',
   description: ''
@@ -300,6 +302,7 @@ const addForm = {
 const editForm = {
   transName: '',
   transCode: '',
+  parentId: '',
   transCategory: '1',
   msgType: '',
   description: ''
@@ -332,6 +335,8 @@ const state = reactive({
   addTitle: '新增',
   // 原字段 :hidden="seen"：根新增时隐藏上级交易
   parentSeen: true,
+  // 上级交易树（原 PayInfoModal loadTreeData → queryIdTree，打开弹窗时加载）
+  addTreeData: [],
   addForm: { ...addForm },
   // 批量删除 / 行删除
   batchDelVisible: false,
@@ -374,10 +379,11 @@ const onTreeSearch = async () => {
 /** 树节点点击（原 onSelect：$emit update:currentSelectFunctionCodeProp / switchData） */
 const onNodeClick = (data) => {
   state.currentNode = data
-  // 原点击节点后回显 tab1 基本信息表单
+  // 原点击节点后回显 tab1 基本信息表单（含 parentId，上级交易名称由 TreeSelect 按 key 回显节点 title）
   state.editForm = {
     transName: data.title,
     transCode: data.transCode || '',
+    parentId: data.parentId || '',
     transCategory: data.transCategory || '1',
     msgType: data.msgType || '',
     description: data.description || ''
@@ -413,6 +419,14 @@ const onRowClick = (row) => {
   onNodeClick({ ...row, title: row.transName })
 }
 
+/** 加载上级交易树（原 PayInfoModal loadTreeData：queryIdTree，add/edit 打开弹窗时调用） */
+const loadAddTree = async () => {
+  const res = await queryIdTree()
+  if (res.returnCode === SUCCESS_STATUS) {
+    state.addTreeData = res.result || []
+  }
+}
+
 /** 添加交易 / 添加子交易（原 handleAdd(1)/handleAdd(2) 打开 PayInfoModal） */
 const onAddTrans = async (type) => {
   if (type === 2 && !state.currentNode) {
@@ -422,11 +436,12 @@ const onAddTrans = async (type) => {
   }
   addFormRef.value && addFormRef.value.resetFields()
   state.addForm = { ...addForm }
+  // 原 PayInfoModal.edit 打开时 loadTreeData() 加载上级交易树
+  loadAddTree()
   if (type === 2) {
     // 原 add(record) 传了 key 则 seen=false（显示上级交易），并预填 parentId
     state.parentSeen = false
     state.addForm.parentId = state.currentNode.key
-    state.addForm.parentName = state.currentNode.title
     state.addTitle = '添加子交易'
   } else {
     state.parentSeen = true
@@ -442,11 +457,11 @@ const onEditTrans = (row) => {
     transName: row.transName,
     transCode: row.transCode || '',
     parentId: row.parentId || '',
-    parentName: '',
     transCategory: row.transCategory || '1',
     msgType: row.msgType || '',
     description: row.description || ''
   }
+  loadAddTree()
   state.parentSeen = false
   state.addTitle = '编辑交易'
   state.addDialogVisible = true
@@ -546,8 +561,7 @@ const onPlaceholder = (text) => {
 
 // 页面加载时
 onMounted(() => {
-  // 原 PayInfoModal 内 queryIdTree 数据源同交易树，此处统一由 loadTree 加载
-  queryIdTree()
+  // 原 PayInfoModal 内 queryIdTree 已改为打开新增/编辑弹窗时由 loadAddTree 加载
   loadTree()
   loadTransList()
 })

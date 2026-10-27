@@ -2,7 +2,7 @@
   <div class="node-panel">
     <div class="panel-title">节点库</div>
 
-    <div v-for="group in nodeGroups" :key="group.title" class="node-group">
+    <div v-for="group in allGroups" :key="group.title" class="node-group">
       <div class="group-title">{{ group.title }}</div>
       <div class="group-items">
         <div
@@ -25,6 +25,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 /**
  * LogicFlow 的 BPMN 节点不能直接用 Vue 拖拽 → canvas 方式，
  * 这里用 LogicFlow 原生的 DndPanel 插件思路简化版：
@@ -32,7 +33,18 @@
  * （完整版拖拽逻辑在 FlowDesigner 中通过 LF.extension.dndPanel 实现）
  */
 
+const props = defineProps({
+  // 外部动态分组（如业务节点列表 commonFlows），结构 [{ title, items: [{ type, label, color? }] }]
+  extraGroups: {
+    type: Array,
+    default: () => []
+  }
+})
+
 const emit = defineEmits(['node-click'])
+
+// 全部分组 = 内置 BPMN 节点 + 外部动态分组（业务节点等，追加在末尾）
+const allGroups = computed(() => [...nodeGroups, ...props.extraGroups])
 
 const nodeGroups = [
   {
