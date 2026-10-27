@@ -1,0 +1,97 @@
+@use './variables.scss' as *;
+
+$checkbox: (
+  btn-bg-color: getVarCss('c-white'),
+  btn-border-color:  getVarCss('c-gray-avg-80'),
+  btn-inner-bg-color: getVarCss('c-white'),
+  btn-inner-text-color: getVarCss('c-white'),
+  text-color: getVarCss('c-gray-avg-20'),
+  btn-hover-bg-color: getVarCss('c-white'),
+  btn-hover-border-color:  getVarCss('c-gray-avg-80'),
+  btn-hover-shadow: 0 0 4px 2px getVarCss('c-gray-avg-93'),
+  btn-inner-hover-bg-color: getVarCss('c-white'),
+  btn-checked-bg-color: getVarCss('c-primary'),
+  btn-checked-border-color:  getVarCss('c-primary'),
+  btn-inner-checked-bg-color: getVarCss('c-primary'),
+);
+
+
+$variantDisabled: (
+  btn-bg-color: getVarCss('c-disabled-fill'),
+  btn-border-color:  getVarCss('c-gray-avg-93'),
+  btn-inner-bg-color: getVarCss('c-disabled-fill'),
+  btn-inner-text-color: getVarCss('c-white'),
+  text-color: getVarCss('c-gray-avg-60'),
+  btn-hover-bg-color: getVarCss('c-disabled-fill'),
+  btn-hover-border-color:  getVarCss('c-gray-avg-93'),
+  btn-hover-shadow: 0 0 0px 0px transparent,
+  btn-inner-hover-bg-color: getVarCss('c-disabled-fill'),
+  btn-checked-bg-color: getVarCss('c-primary-disabled'),
+  btn-checked-border-color:  getVarCss('c-primary-disabled'),
+  btn-inner-checked-bg-color: getVarCss('c-primary-disabled'),
+);
+
+@include b('checkbox') {
+  @include set-component-css-var('checkbox', $checkbox);
+  @apply inline-flex justify-start items-center cursor-pointer select-none;
+  color: getVarCss('checkbox-text-color');
+  &__shape {
+    @apply  relative inline-flex items-center justify-center;
+    @apply w-6 h-6;
+  }
+  &__faker {
+    @apply block w-4 h-4 m-auto rounded-sm flex-grow-0 flex-shrink-0;
+    @apply relative;
+    border: 1px solid getVarCss('checkbox-btn-border-color');
+    background-color: getVarCss('checkbox-btn-bg-color');
+    
+
+    &-inner{
+      @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+      @apply w-3 h-3 inline-flex items-center justify-center;
+      @apply leading-4;
+      color: getVarCss('checkbox-btn-inner-text-color');
+      background-color: getVarCss('checkbox-btn-inner-bg-color');
+      &—indeterminate {
+        @apply inline-block rounded;
+        @apply w-2 h-[2px];
+        background-color: getVarCss('checkbox-btn-inner-bg-color');
+      }
+    }
+    &:hover {
+      box-shadow: getVarCss('checkbox-btn-hover-shadow');
+    }
+  }
+  &__original {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+    @apply -z-10 opacity-0 outline-none appearance-none w-2 h-2;
+  }
+  &__label {
+    @apply flex-1 ml-1;
+    color: getVarCss('checkbox-text-color');
+  }
+  $SLCT: &;
+  &.is-checked, &.is-indeterminate {
+    #{$SLCT}__faker {
+      background-color: getVarCss('checkbox', 'btn-checked-bg-color');
+      
+      border: 1px solid getVarCss('checkbox','btn-checked-border-color');
+      &-inner{
+        background-color: getVarCss('checkbox-btn-checked-bg-color');
+      }
+      :hover {
+        box-shadow: none;
+      }
+    }
+  }
+  // &.is-focus {
+
+  // }
+  &.is-disabled {
+    @include set-component-css-var('checkbox', $variantDisabled);
+    @apply cursor-not-allowed;
+  }
+  &:not(:last-child) {
+    @apply mr-3;
+  }
+}

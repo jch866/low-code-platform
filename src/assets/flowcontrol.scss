@@ -1,0 +1,134 @@
+.flow-root{
+	overflow:hidden;
+	position: relative;
+}
+.flow-root:after{
+	content: '';
+    visibility: hidden;
+    clear: both;
+    display: block;
+}
+.node-list{
+	overflow-y:auto;
+	width:180px;
+	min-height: 600px;
+	border-left:1px solid #cccccc;
+	background-image: url("../assets/img/flowcontrol/node-list-bg.png");
+}
+.node-list-wrapper{
+	overflow:visible ;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 0;
+}
+.edit-board{
+	min-height: 600px;
+	margin-right: 181px;
+	position: relative;
+	z-index:0;
+	overflow: auto;
+	border: 1px solid #e4f3f3;
+}
+.edit-board>.node{
+	position: fixed;
+}
+.node-list>*:nth-of-type(2n){
+	background-color:#e4f3f3;
+}
+.node-list>*:nth-of-type(2n+1){
+	background-color:#f7faff;
+}
+.node-list>*{
+	font-size: 14px;
+	line-height: 40px;
+	height: 40px;
+}
+.node{
+	cursor: default;
+	text-overflow:ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.node>img.ico{
+	width:24px;
+	height:24px;
+}
+.node-list>.node>img.ico{
+	margin-right: 10px;
+	margin-left: 15px;
+}
+.node.in-board{
+	height:50px;
+	max-width: 180px;
+	min-width: 50px;
+}
+.node[nodetype='1'].in-board,.node[nodetype='2'].in-board{
+	text-align:center;
+	width: 54px;
+    color:#2ea1f0;
+    height: 54px;
+    line-height:75px;
+}
+.node[nodetype='1'].in-board,.node[nodetype='2'].in-board>img.ico{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.node[nodetype='1'].in-board{
+	background-image: url("../assets/img/flowcontrol/start-icon-in-board.png");
+}
+.node[nodetype='2'].in-board{
+	background-image: url("../assets/img/flowcontrol/stop-icon-in-board.png");
+}
+.node[nodetype='3'].in-board{
+	color:#7fb82d;
+	height: 50px;
+	border: 2px solid;
+	line-height: 50px;
+	padding: 0 12px;
+	border-radius: 6px;
+	display: flex;
+  align-items: center;
+}
+.node[nodetype='3'].in-board>img.ico{
+	margin-top: -5px;
+}
+.node[nodetype='4'].in-board{
+	color:#fe883a;
+	width: 120px;
+    height: 120px;
+    text-align: center;
+    line-height: 30px;
+}
+.node[nodetype='4'].in-board>img.ico{
+	display: block;
+	margin: 31px auto 0;
+}
+.node[nodetype='4'].in-board>.bg{
+	color:#fe883a;
+	width: 85px;
+    height: 85px;
+    margin-top: 17px;
+    margin-left: 17.4px;
+    margin-right: auto;
+    border:2px solid;
+    border-radius: 6px;
+    transform:rotate(45deg);
+    position: absolute;
+	z-index: -1;
+}
+.node[nodetype='4'][id]:before{
+	content:'T';
+	display:inline;
+	position:absolute;
+	left: 55px;
+    top: 89px;
+}
+.node[nodetype='4'][id]:after{
+	content:'F';
+	display:inline;
+	position:absolute;
+	right:0;
+    top: 27px;
+}

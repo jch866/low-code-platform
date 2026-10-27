@@ -1,0 +1,259 @@
+@use './variables.scss' as *;
+
+$pagination: (
+  'total-describe-font': getVarCss('font-size-12'),
+  'font-size': getVarCss('font-size-14'),
+  'total-babel-margin-right': 4px,
+  'bg-color': getVarCss('c-white'),
+  'text-color-regular': getVarCss('c-pagination-text'),
+  'padding': 2px 5px,
+  'font-wieght': getVarCss('font-weight-regular'),
+  'button-width': 32px,
+  'button-height': 32px,
+  'button-padding': 0 6px,
+  'button-disabled-color': #a8abb2,
+  'button-disabled-bg-color': #fff,
+  'button-bg-color': getVarCss('c-mix-high-1'),
+  'hover-color': getVarCss('c-primary'),
+  'text-color-placeholder': #a8abb2,
+  'disabled-bg-color': #f5f7fa,
+  'text-color-secondary': #909399,
+  'jump-margin-left': 16px,
+  'editor-margin': 0 8px,
+  'editor-min-width': 56px,
+  'jump-input-width': 50px,
+  'select-pages-width': 75px,
+  'fill-color-dark': #ebedf0,
+  'color-primary': getVarCss('c-base-blue-2'),
+  'li-padding': 0 4px,
+  'li-margin': 0 4px,
+  'li-marin-normal': 0 1px,
+  'prev-next-icon-font-size': getVarCss('font-size-12')
+);
+
+@mixin pagination-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: getVarCss('pagination-font-size');
+  min-width: getVarCss('pagination-button-width');
+  height: getVarCss('pagination-button-height');
+  line-height: getVarCss('pagination-button-height');
+  box-sizing: border-box;
+}
+
+@include b('pagination') {
+  @include set-component-css-var('pagination', $pagination);
+
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: getVarCss('pagination-padding');
+  font-weight: getVarCss('pagination-font-wieght');
+  color: getVarCss('pagination-text-color-regular');
+
+  button {
+    @include pagination-button;
+    background: transparent;
+    border: none;
+    padding: getVarCss('pagination-button-padding');
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      color: getVarCss('pagination-hover-color');
+    }
+
+    &:disabled {
+      color: getVarCss('pagination-button-disabled-color');
+      background-color: getVarCss('pagination-button-disabled-bg-color');
+      cursor: not-allowed;
+    }
+  }
+
+  .#{$ns}-pagination__btn-prev,
+  .#{$ns}-pagination__btn-next {
+    background: center center no-repeat;
+    background-size: 16px;
+    background-color: getVarCss('pagination-bg-color');
+    color: getVarCss('pagination-text-color-regular');
+
+    .#{$ns}-icon {
+      font-size: getVarCss('pagination-prev-next-icon-font-size');
+    }
+
+    &:focus-visible {
+      outline: 1px solid getVarCss('pagination-hover-color');
+      color: getVarCss('pagination-hover-color');
+    }
+  }
+
+  &__total {
+    font-size: getVarCss('pagination-total-describe-font');
+    color: getVarCss('pagination-text-color-regular');
+    font-weight: getVarCss('pagination-font-wieght');
+    margin-right: getVarCss('pagination-total-babel-margin-right');
+    &[disabled='true'] {
+      color: getVarCss('pagination-text-color-placeholder');
+    }
+  }
+
+  &__jump {
+    margin-left: getVarCss('pagination-jump-margin-left');
+    font-size: getVarCss('pagination-font-size');
+    font-weight: getVarCss('pagination-font-wieght');
+    color: getVarCss('pagination-text-color-regular');
+    &[disabled='true'] {
+      color: getVarCss('pagination-text-color-placeholder');
+    }
+  }
+
+  &__editor {
+    margin: getVarCss('pagination-editor-margin');
+    height: getVarCss('pagination-button-height');
+    min-width: getVarCss('pagination-editor-min-width');
+    text-align: center;
+    box-sizing: border-box;
+
+    &.#{$ns}-input {
+      width: getVarCss('pagination-jump-input-width');
+    }
+
+    &.#{$ns}-input .#{$ns}-input__inner {
+      // height: getVarCss('pagination-button-height');
+      width: getVarCss('pagination-jump-input-width');
+      color: getVarCss('pagination-text-color-regular');
+    }
+  }
+
+  &__sizes {
+    margin-left: getVarCss('pagination-total-babel-margin-right');
+    .#{$ns}-input__inner {
+      width: getVarCss('pagination-select-pages-width');
+      color: getVarCss('pagination-text-color-regular');
+    }
+  }
+
+  &__pager {
+    user-select: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+
+    li {
+      padding: getVarCss('pagination-li-padding');
+      background: getVarCss('pagination-bg-color');
+      @include pagination-button;
+      cursor: pointer;
+      text-align: center;
+      margin: getVarCss('pagination-li-marin-normal');
+
+      &.btn-quickprev:hover {
+        cursor: pointer;
+      }
+
+      &.btn-quicknext:hover {
+        cursor: pointer;
+      }
+
+      &.btn-quicknext,
+      &.btn-quickprev {
+        line-height: getVarCss('pagination-button-height');
+        // color: getVarCss('pagination-button-color');
+
+        .#{$ns}-icon {
+          pointer-events: none;
+          font-size: getVarCss('pagination-prev-next-icon-font-size');
+        }
+
+        &.is-disabled {
+          cursor: not-allowed;
+          color: getVarCss('pagination-text-color-placeholder');
+        }
+
+        &:focus-visible {
+          outline: 1px solid getVarCss('pagination-hover-color');
+          color: getVarCss('pagination-hover-color');
+        }
+      }
+
+      &.is-active + li {
+        border-left: 0;
+      }
+
+      &:focus-visible {
+        outline: 1px solid getVarCss('pagination-hover-color');
+      }
+
+      &:hover {
+        color: getVarCss('pagination-hover-color');
+      }
+
+      &.is-active {
+        color: getVarCss('pagination-hover-color');
+        cursor: default;
+
+        &.is-disabled {
+          font-weight: getVarCss('pagination-font-weight');
+          color: getVarCss('pagination-text-color-secondary');
+        }
+      }
+
+      &.is-disabled {
+        cursor: not-allowed;
+        color: getVarCss('pagination-text-color-placeholder');
+      }
+    }
+  }
+
+  &.is-background {
+    .#{$ns}-pagination__btn-prev,
+    .#{$ns}-pagination__btn-next,
+    .#{$ns}-pagination__pager li {
+      margin: getVarCss('pagination-li-margin');
+      background-color: getVarCss('pagination-button-bg-color');
+      color: getVarCss('pagination-text-color-regular');
+      min-width: getVarCss('pagination-button-width');
+
+      &.is-disabled {
+        cursor: not-allowed;
+        color: getVarCss('pagination-text-color-placeholder');
+        background-color: getVarCss('pagination-disabled-bg-color');
+      }
+
+      &.is-active {
+        color: getVarCss('pagination-text-color-secondary');
+        background-color: getVarCss('pagination-fill-color-dark');
+      }
+    }
+
+    .#{$ns}-pagination__btn-prev,
+    .#{$ns}-pagination__btn-next {
+      padding: 0;
+      margin: getVarCss('pagination-li-margin');
+      background-color: getVarCss('pagination-button-bg-color');
+      &:disabled {
+        color: getVarCss('pagination-text-color-placeholder');
+        background-color: getVarCss('pagination-disabled-bg-color');
+      }
+      &:hover:not([disabled]) {
+        color: getVarCss('pagination-hover-color');
+      }
+    }
+
+    .#{$ns}-pagination__pager li:not(.is-disabled) {
+      &:hover {
+        color: getVarCss('pagination-hover-color');
+      }
+      &.is-active {
+        background-color: getVarCss('pagination-color-primary');
+        color: getVarCss('pagination-hover-color');
+        font-weight: getVarCss('pagination-font-wieght');
+      }
+    }
+  }
+}

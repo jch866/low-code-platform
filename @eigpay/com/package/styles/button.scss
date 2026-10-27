@@ -1,0 +1,143 @@
+@use 'sass:map';
+@use 'variables' as *;
+// @import "tailwindcss/base";
+// @import "tailwindcss/components";
+// @import "tailwindcss/utilities";
+
+$button_base: (
+  c-text: getVarCss('c-gray-avg-40'),
+  c-border: getVarCss('c-info'),
+  c-bg: getVarCss('c-info'),
+  c-focus-text: getVarCss('c-gray-avg-40'),
+  c-focus-border: getVarCss('c-info-hover'),
+  c-focus-bg: getVarCss('c-info-hover'),
+  c-hover-text: getVarCss('c-gray-avg-40'),
+  c-hover-border: getVarCss('c-info-hover'),
+  c-hover-bg: getVarCss('c-info-hover'),
+  c-active-text: getVarCss('c-gray-avg-40'),
+  c-active-border: getVarCss('c-info-active'),
+  c-active-bg: getVarCss('c-info-active'),
+  c-disabled-text: getVarCss('c-gray-avg-60'),
+  c-disabled-border: getVarCss('c-info-disabled'),
+  c-disabled-bg: getVarCss('c-info-disabled'),
+);
+
+$defaultBtn: (
+  default: $button_base,
+  plain: map.merge($button_base, (
+    c-border: getVarCss('c-mix-high-2'),
+    c-focus-border: getVarCss('c-mix-high-2'),
+    c-hover-border: getVarCss('c-mix-high-2'),
+    c-active-border: getVarCss('c-mix-high-2'),
+    c-disabled-border: getVarCss('c-mix-high-2')
+  ))
+);
+
+$primary_base: map.merge($button_base, (
+  c-text: getVarCss('c-white'),
+  c-border: getVarCss('c-primary'),
+  c-bg: getVarCss('c-primary'),
+  c-focus-text: getVarCss('c-white'),
+  c-focus-border: getVarCss('c-primary-hover'),
+  c-focus-bg: getVarCss('c-primary-hover'),
+  c-hover-text: getVarCss('c-white'),
+  c-hover-border: getVarCss('c-primary-hover'),
+  c-hover-bg: getVarCss('c-primary-hover'),
+  c-active-text: getVarCss('c-white'),
+  c-active-border: getVarCss('c-primary-active'),
+  c-active-bg: getVarCss('c-primary-active'),
+  c-disabled-text: getVarCss('c-white'),
+  c-disabled-border: getVarCss('c-primary-disabled'),
+  c-disabled-bg: getVarCss('c-primary-disabled'),
+));
+
+$primary: (
+  default: $primary_base,
+  plain: map.merge($primary_base, (
+    c-text: getVarCss('c-primary'),
+    c-bg: getVarCss('c-white'),
+    c-focus-text: getVarCss('c-primary-hover'),
+    c-focus-bg: getVarCss('c-white'),
+    c-hover-text: getVarCss('c-primary-hover'),
+    c-hover-bg: getVarCss('c-white'),
+    c-active-text: getVarCss('c-primary-active'),
+    c-active-bg: getVarCss('c-white'),
+    c-disabled-text: getVarCss('c-primary-disabled'),
+    c-disabled-bg: getVarCss('c-white'),
+  )),
+);
+
+$btnFont: (
+  font-size: getVarCss(font-size-14),
+  font-weight: getVarCss(font-weight-regular),
+);
+$btnBorder: (
+  border-style: solid,
+  border-width: 1px,
+  border-radius: 4px
+);
+$btnBox: (
+  padding: 8px 16px
+);
+
+@include b('button') {
+  @include set-component-css-var('button', map.get($defaultBtn, 'default'));
+  @include set-component-css-var('button', $btnFont);
+  @include set-component-css-var('button', $btnBorder);
+  @include set-component-css-var('button', $btnBox);
+}
+
+@include b('button') {
+  @apply inline-flex justify-center items-center leading-none whitespace-nowrap h-8 cursor-pointer text-center box-border;
+  @apply outline-none duration-100 select-none align-middle px-4 py-2 text-sm rounded;
+  color: getVarCss('button', 'c-text');
+  font-weight: getVarCss('button', 'font-weight');
+  background-color: getVarCss('button', 'c-bg');
+  border: getVarCss('button', 'border-width') getVarCss('button', 'border-style') getVarCss('button', 'c-border');
+  border-color: getVarCss('button-c-border');
+  &:focus {
+    color: getVarCss('button-c-focus-text');
+    background-color: getVarCss('button-c-focus-bg');
+    border-color: getVarCss('button-c-focus-border');
+  }
+  &:hover {
+    color: getVarCss('button-c-hover-text');
+    background-color: getVarCss('button-c-hover-bg');
+    border-color: getVarCss('button-c-hover-border');
+  }
+  &:active {
+    color: getVarCss('button-c-active-text');
+    background-color: getVarCss('button-c-active-bg');
+    border-color: getVarCss('button-c-active-border');
+  }
+  &.is-disabled {
+    @apply cursor-not-allowed;
+    color: getVarCss('button-c-disabled-text');
+    background-color: getVarCss('button-c-disabled-bg');
+    border-color: getVarCss('button-c-disabled-border');
+    &:hover, &:active {
+      color: getVarCss('button-c-disabled-text');
+      background-color: getVarCss('button-c-disabled-bg');
+      border-color: getVarCss('button-c-disabled-border');
+    }
+  }
+  &.is-plain {
+    @include set-component-css-var('button', map.get($defaultBtn, 'plain'));
+  }
+  &.is-dashed {
+    @apply border-dashed;
+    // .var_def(button-border-style,  dashed);
+  }
+  &.is-round {
+    @apply px-4 rounded-full;
+  }
+  & + & {
+    @apply ml-3;
+  }
+}
+@include b('button-primary') {
+  @include set-component-css-var('button', map.get($primary, 'default'));
+  &.is-plain {
+    @include set-component-css-var('button', map.get($primary, 'plain'));
+  }
+}

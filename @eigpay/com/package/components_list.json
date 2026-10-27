@@ -1,0 +1,134 @@
+[
+  {
+    "compName": "button",
+    "compZhName": "Button"
+  },
+  {
+    "compName": "form",
+    "compZhName": "Form"
+  },
+  {
+    "compName": "input",
+    "compZhName": "Input"
+  },
+  {
+    "compName": "select",
+    "compZhName": "Select"
+  },
+  {
+    "compName": "radio",
+    "compZhName": "Radio"
+  },
+  {
+    "compName": "checkbox",
+    "compZhName": "Checkbox"
+  },
+  {
+    "compName": "switch",
+    "compZhName": "Switch"
+  },
+  {
+    "compName": "icon",
+    "compZhName": "Icon"
+  },
+  {
+    "compName": "pagination",
+    "compZhName": "Pagination"
+  },
+  {
+    "compName": "breadcrumb",
+    "compZhName": "Breadcrumb"
+  },
+  {
+    "compName": "datePicker",
+    "compZhName": "DatePicker"
+  },
+  {
+    "compName": "datePickerApp",
+    "compZhName": "DatePickerApp"
+  },
+  {
+    "compName": "dateTimePicker",
+    "compZhName": "DateTimePicker"
+  },
+  {
+    "compName": "timePicker",
+    "compZhName": "TimePicker"
+  },
+  {
+    "compName": "touchSlider",
+    "compZhName": "TouchSlider"
+  },
+  {
+    "compName": "card",
+    "compZhName": "Card"
+  },
+  {
+    "compName": "table",
+    "compZhName": "Table"
+  },
+  {
+    "compName": "upload",
+    "compZhName": "Upload"
+  },
+  {
+    "compName": "tooltip",
+    "compZhName": "Tooltip"
+  },
+  {
+    "compName": "tree",
+    "compZhName": "Tree"
+  },
+  {
+    "compName": "popover",
+    "compZhName": "Popover"
+  },
+  {
+    "compName": "tab",
+    "compZhName": "Tab"
+  },
+  {
+    "compName": "step",
+    "compZhName": "Step"
+  },
+  {
+    "compName": "progress",
+    "compZhName": "Progress"
+  },
+  {
+    "compName": "anchor",
+    "compZhName": "Anchor"
+  },
+  {
+    "compName": "collapse",
+    "compZhName": "Collapse"
+  },
+  {
+    "compName": "badge",
+    "compZhName": "Badge"
+  },
+  {
+    "compName": "scrollBar",
+    "compZhName": "ScrollBar"
+  },
+  {
+    "compName": "adress",
+    "compZhName": "Adress"
+  },
+  {
+    "compName": "dialog",
+    "compZhName": "Dialog"
+  },
+  {
+    "compName": "message",
+    "compZhName": "Message"
+  },
+  {
+    "compName": "menu",
+    "compZhName": "Menu"
+  },
+  {
+    "compName": "loading",
+    "compZhName": "Loading"
+  }
+]

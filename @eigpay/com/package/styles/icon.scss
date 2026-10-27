@@ -1,0 +1,12 @@
+@use 'variables' as *;
+
+@include b('icon') {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  & + & {
+    @apply ml-3;
+  }
+}

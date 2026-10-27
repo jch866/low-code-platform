@@ -1,0 +1,60 @@
+{
+  "name": "@eigpay/com-proj",
+  "version": "0.0.0",
+  "files": [
+    "dist/lib"
+  ],
+  "main": "./dist/lib/index.umd.js",
+  "module": "./dist/lib/index.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/lib/index.es.js",
+      "require": "./dist/lib/index.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite -c build/vite.dev.config.js",
+    "build-lib": "vite build -c build/vite.lib.config.js",
+    "build-doc": "vite build -c build/vite.doc.config.js",
+    "preview": "vite preview --port 4173",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "preinstall": "npx force-resolutions"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.6",
+    "@vueuse/core": "^9.6.0",
+    "async-validator": "^4.2.5",
+    "copy-to-clipboard": "^3.3.3",
+    "dayjs": "^1.11.7",
+    "lodash": "^4.17.21",
+    "pinia": "^2.0.21",
+    "vue": "^3.2.45",
+    "vue-router": "^4.1.5"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.1.4",
+    "@vitejs/plugin-vue": "^3.0.3",
+    "@vitest/coverage-c8": "^0.28.5",
+    "@vitest/coverage-istanbul": "^0.28.5",
+    "@vue/eslint-config-prettier": "^7.0.0",
+    "@vue/test-utils": "^2.0.2",
+    "autoprefixer": "^10.4.13",
+    "eslint": "^8.22.0",
+    "eslint-plugin-vue": "^9.3.0",
+    "jsdom": "^20.0.0",
+    "postcss": "^8.4.31",
+    "prettier": "^2.7.1",
+    "prismjs": "^1.29.0",
+    "sass": "^1.56.1",
+    "tailwindcss": "^3.2.4",
+    "vite": "^3.0.9",
+    "vite-plugin-md": "^0.20.4",
+    "vite-plugin-static-copy": "^0.12.0",
+    "vitest": "^0.28.5"
+  },
+  "resolutions":{
+    "postcss": "^8.4.31"
+  }
+}

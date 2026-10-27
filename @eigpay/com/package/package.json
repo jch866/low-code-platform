@@ -1,0 +1,11 @@
+{
+  "name": "@eigpay/components",
+  "version": "0.0.1",
+  "description": "all components are settled here",
+  "main": "index.js",
+  "module": "index.js",
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "sideEffects": false
+}

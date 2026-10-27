@@ -1,0 +1,58 @@
+@use './variables.scss' as *;
+
+$upload: (
+  item-width: 360px,
+  item-img-size: 40px,
+  item-main-size: 14px,
+  item-delete-right: -24px
+);
+
+@include b('upload') {
+  @include set-component-css-var('upload', $upload);
+  max-width: 100%;
+  &-basic {
+    @apply inline-block;
+  }
+  &__input {
+    display: none;
+  }
+  &-list {
+    @apply w-full h-full;
+    &__item-info {
+      @apply relative pl-3 py-2;
+      background-color: getVarCss('c-mix-high-1');
+      &-content {
+        @apply flex items-center;
+        img {
+          @apply object-cover;
+          width: getVarCss('upload', 'item-img-size');
+          height: getVarCss('upload', 'item-img-size');
+        }
+        &-name {
+          @apply ml-2 leading-6;
+          font-size: getVarCss('upload', 'item-main-size');
+          color: getVarCss('c-gray-avg-20');
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding-right: 2rem;
+        }
+        &-status {
+          @apply absolute right-3;
+        }
+        &-delete {
+          @apply absolute cursor-pointer right-3;
+          // right: getVarCss('upload', 'item-delete-right');
+        }
+      }
+      &-progress {
+        @apply mt-1;
+        .#{$ns}-progress__text {
+          min-width: 0;
+          margin-right: 8px;
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,120 @@
+@use './variables.scss' as *;
+
+$tab: ();
+
+$tab-header: (
+  height: fit-content,
+  activeBarWidth: 88px,
+  activerMarginTop: 40px,
+  cardCanSelectBackGroundColor: rgba(0, 0, 0, 0.02),
+  cardCanNotSelectBackGroundColor: rgba(0, 0, 0, 0.04),
+  cardBoardColor: rgba(0, 0, 0, 0.15)
+);
+
+$tab-content: (
+  height: 120px
+);
+
+@include b('tab') {
+  @include set-component-css-var('tab', $tab);
+  @apply w-full leading-8 text-sm cursor-pointer relative;
+  height: getVarCss('tab', 'height');
+  &-header {
+    @include set-component-css-var('tab-header', $tab-header);
+    // @apply flex;
+    height: getVarCss('tab-header', 'height');
+    border-bottom: 1px solid getVarCss('c-gray-avg-80');
+    &__wrapper {
+      @apply overflow-hidden relative;
+      margin-bottom: -1px;
+      .#{$ns}-tab-header__wrapper_nav {
+        @apply flex items-center;
+        overflow: hidden;
+      }
+    }
+    &--item {
+      @apply px-4 py-2.5 leading-5 flex-shrink-0 select-none;
+      &.is-active {
+        color: getVarCss('c-primary');
+      }
+      &.is-disabled {
+        color: getVarCss('c-text-disable');
+        cursor: not-allowed;
+      }
+      &.is-card {
+        border: 1px solid getVarCss('tab-header', 'cardBoardColor');
+        border-bottom: 0px;
+        border-radius: 4px 4px 0 0;
+        margin-right: 2px;
+        background-color: getVarCss(
+          'tab-header',
+          'cardCanSelectBackGroundColor'
+        );
+      }
+      &.is-custom-header {
+        padding: 0;
+        border-bottom: 1px solid transparent;
+      }
+    }
+    &--item:last-child {
+      &.is-card {
+        margin-right: 0px;
+      }
+    }
+    &__active-bar {
+      @apply absolute;
+      height: 2px;
+      bottom: 0;
+      z-index: 100;
+      background-color: getVarCss('c-primary');
+      border-radius: 1px;
+      transition: width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+        transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    }
+    &__scroll {
+      @apply flex items-center overflow-hidden relative float-left;
+      &::after {
+        content: ' ';
+        @apply clear-both;
+      }
+    }
+    &__scroll-inner {
+      @apply flex flex-nowrap;
+    }
+    &__scroll-operator {
+      @apply inline-flex items-center m-1 shrink-0;
+    }
+    &__scroll-thumb {
+      @apply px-1;
+      color: getVarCss('c-primary');
+      &.is-scroll-thumb-disabled {
+        @apply cursor-not-allowed;
+        color: getVarCss('c-gray-avg-60');
+      }
+    }
+    &__scroll-thumb-left {
+      @apply rotate-180;
+    }
+  }
+  &-content {
+    @include set-component-css-var('tab-content', $tab-content);
+    min-height: getVarCss('tab-content', 'height');
+  }
+  @include m('border-card') {
+    
+    .#{$ns}-tab-header {
+      border-bottom: none;
+      background-color: getVarCss('c-gray-avg-98');
+      .#{$ns}-tab-header--item {
+        border-top: 1px solid transparent;
+        border-left: 1px solid transparent;
+        border-bottom: 1px solid getVarCss('c-gray-avg-93');
+        border-right: 1px solid getVarCss('c-gray-avg-93');
+        &.is-active {
+          background-color:  getVarCss('c-white');
+          border-bottom: 1px solid transparent;
+        }
+      }
+    }
+  }
+}

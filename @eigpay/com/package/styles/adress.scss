@@ -1,0 +1,21 @@
+@use 'variables' as *;
+
+@include b('adress') {
+  width: 100%;
+  &__top {
+    display: flex;
+    align-items: center;
+    .#{$ns}-select {
+      // width: 200px;
+      & + .#{$ns}-select {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  &__bottom {
+    .#{$ns}-input {
+      margin-top: 10px;
+    }
+  }
+}

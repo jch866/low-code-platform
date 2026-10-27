@@ -1,0 +1,121 @@
+@use 'variables' as *;
+@use 'sass:color';
+
+$message: (
+  'padding': 12px 16px,
+  'icon-margin-right': 10px,
+  'title-color': getVarCss('c-gray-avg-20'),
+  'close-btn-color': getVarCss('c-gray-avg-40'),
+  'icon-color': getVarCss('c-primary'),
+  'border': 1px solid getVarCss('c-primary'),
+  'box-shadow': 0px 4px 10px 0px rgba(0, 0, 0, 0.1),
+  'bg-color': #e5eff9,
+  'border-radius': 4px,
+  'transition-duration': 0.3s
+);
+
+$messageInfo: (
+  'icon-color': getVarCss('c-primary'),
+  'border': 1px solid getVarCss('c-primary'),
+  'bg-color': #e5eff9
+);
+
+$messageSuccess: (
+  'icon-color': getVarCss('c-success'),
+  'border': 1px solid getVarCss('c-success'),
+  'bg-color': #e5f7e9
+);
+
+$messageWarning: (
+  'icon-color': getVarCss('c-warning'),
+  'border': 1px solid getVarCss('c-warning'),
+  'bg-color': #fff2e5
+);
+
+$messageError: (
+  'icon-color': getVarCss('c-error'),
+  'border': 1px solid getVarCss('c-error'),
+  'bg-color': #feebeb
+);
+
+$messageStyle: (
+  'border': 1px solid #e5e6eb,
+  'bg-color': getVarCss('c-white'),
+  'box-shadow': 0px 4px 10px 0px rgba(0, 0, 0, 0.1)
+);
+
+$pagetipStyle: (
+  'box-shodow': none
+);
+
+@include b('message') {
+  @include set-component-css-var('message', $message);
+
+  position: fixed;
+  z-index: 1100;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  border: getVarCss('message-border');
+  background-color: getVarCss('message-bg-color');
+  padding: getVarCss('message-padding');
+  box-shadow: getVarCss('message-box-shadow');
+  display: flex;
+  align-items: center;
+  border-radius: getVarCss('message-border-radius');
+  transition: top getVarCss('message-transition-duration');
+
+  &__icon {
+    margin-right: getVarCss('message-icon-margin-right');
+    color: getVarCss('message-icon-color');
+  }
+
+  &__content {
+    color: getVarCss('message-title-color');
+    font-size: getVarCss('font-size-14');
+  }
+
+  &__closeBtn {
+    font-size: getVarCss('font-size-12');
+    color: getVarCss('message-close-btn-color');
+    margin-left: getVarCss('message-icon-margin-right');
+    cursor: pointer;
+    &:hover {
+      color: getVarCss('c-primary');
+    }
+  }
+
+  &.is-info {
+    @include set-component-css-var('message', $messageInfo);
+  }
+  &.is-success {
+    @include set-component-css-var('message', $messageSuccess);
+  }
+  &.is-warning {
+    @include set-component-css-var('message', $messageWarning);
+  }
+  &.is-error {
+    @include set-component-css-var('message', $messageError);
+  }
+  &.is-message {
+    @include set-component-css-var('message', $messageStyle);
+  }
+  &.is-pagetip {
+    @include set-component-css-var('message', $pagetipStyle);
+  }
+  &.is-nocenter {
+    align-items: flex-start;
+  }
+}
+
+.#{$ns}-message-fade-enter-active,
+.#{$ns}-message-fade-leave-active {
+  transition: all getVarCss('message-transition-duration');
+}
+
+.#{$ns}-message-fade-enter-from,
+.#{$ns}-message-fade-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -100%);
+}

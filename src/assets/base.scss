@@ -1,0 +1,48 @@
+@use "sass:math";
+@use "./variables.scss" as *;
+$base-font-size: 16;
+
+:root {
+  #{$pns}c-white: #fff;
+  #{$pns}c-white-soft: #f8f8f8;
+  #{$pns}c-black: #000;
+  #{$pns}c-black-soft: #222;
+  #{$pns}c-black-mute: #282828;
+  #{$pns}c-indigo: #2c3e50;
+
+  #{$pns}c-divider-light-1: rgba(60, 60, 60, 0.29);
+  #{$pns}c-divider-light-2: rgba(60, 60, 60, 0.12);
+  #{$pns}c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  #{$pns}c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  #{$pns}c-text-light-1: var(#{$pns}c-indigo);
+  #{$pns}c-text-light-2: rgba(60, 60, 60, 0.66);
+  #{$pns}c-text-dark-1: var(#{$pns}c-white);
+  #{$pns}c-text-dark-2: rgba(235, 235, 235, 0.64);
+  
+  #{$pns}font-size-normal: #{math.div(12, $base-font-size)}rem;
+  #{$pns}font-size-middel: #{math.div(14, $base-font-size)}rem;
+  #{$pns}font-size-bigger: #{math.div(16, $base-font-size)}rem;
+  #{$pns}font-size-large: #{math.div(18, $base-font-size)}rem;
+}
+
+.#{$ns} {
+  --color-background: var(#{$pns}c-white);
+  --color-background-soft: var(#{$pns}c-white-soft);
+  --color-background-mute: var(#{$pns}c-white-mute);
+
+  --color-border: var(#{$pns}c-divider-light-2);
+  --color-border-hover: var(#{$pns}c-divider-light-1);
+
+  --color-heading: var(#{$pns}c-text-light-1);
+  --color-text: var(#{$pns}c-text-light-1);
+
+  --section-gap: 160px;
+}
+
+/*
+@return 转换后的单位 ××rem。
+*/
+@function unit-convertor($n) {
+  @return math.div($n, $base-font-size) + rem;
+}

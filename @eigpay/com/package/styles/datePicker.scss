@@ -1,0 +1,291 @@
+@use './variables.scss' as *;
+@use 'sass:map';
+$picker: (
+  text-color: getVarCss('c-gray-avg-20'),
+  bg-color: getVarCss('c-white'),
+  border-color: getVarCss('c-mix-high-2'),
+  placeholder-color: getVarCss('c-gray-avg-60'),
+  icon-color: getVarCss('c-gray-avg-20'),
+  font-size: getVarCss('font-size-13'),
+  border-radius: getVarCss('border-radius-sm'),
+  height: 32px,
+  width: 270px
+);
+$variantHover: (
+  border-color: getVarCss('c-mix-high-2')
+);
+$variantFocus: (
+  border-color: getVarCss('c-primary')
+);
+$variantDisabled: (
+  text-color: getVarCss('c-gray-avg-60'),
+  border-color: getVarCss('c-gray-avg-93'),
+  bg-color: getVarCss('c-gray-avg-93')
+);
+
+$footer: (
+  height: 36px
+);
+$dateTimeHeader: (
+  height: 54px
+);
+
+@mixin cell-states($e ) {
+  @at-root {
+    #{$e}.is-previous {
+      #{$e}-inner {
+        color: getVarCss('c-gray-avg-80');
+      }
+    }
+    #{$e}.is-next {
+      #{$e}-inner {
+        color: getVarCss('c-gray-avg-80');
+      }
+    }
+    #{$e}.is-current:not(.is-disabled) {
+      #{$e}-inner {
+        color: getVarCss('c-primary'); 
+        background-color: getVarCss('c-base-blue-2'); 
+      }
+    }
+    #{$e}.is-selected:not(.is-disabled)  {
+      #{$e}-inner {
+        background-color: getVarCss('c-primary'); 
+        color: getVarCss('c-white'); 
+      }
+    }
+    #{$e}.is-disabled {
+      @apply cursor-not-allowed;
+      background-color: getVarCss('c-mix-high-1');
+      #{$e}-inner {
+        color: getVarCss('c-gray-avg-80');
+      }
+    }
+    #{$e}.is-in-range:not(.is-next, .is-previous, .is-disabled) {
+      background-color: getVarCss('c-base-blue-2');
+    }
+    #{$e}.is-range-start:not(.is-next, .is-previous, .is-disabled) {
+      @apply rounded-l-full;
+      #{$e}-inner {
+        @apply rounded-full;
+        background-color: getVarCss('c-primary'); 
+        color: getVarCss('c-white'); 
+      }
+      // border-radius: 50% 0 0 50%;
+    }
+    #{$e}.is-range-end:not(.is-next, .is-previous, .is-disabled) {
+      @apply rounded-r-full;
+      #{$e}-inner {
+        @apply rounded-full;
+        background-color: getVarCss('c-primary'); 
+        color: getVarCss('c-white'); 
+      }
+    }
+  }
+}
+
+@include b('date-picker') {
+  @include set-component-css-var('date-picker', $picker);
+  @apply flex leading-8 align-middle w-full;
+  height: getVarCss('date-picker', 'height');
+  // min-width: getVarCss('date-picker', 'width');
+  &__wrapper {
+    @apply w-full;
+  }
+  &__range-inner {
+    text-align: center;
+  }
+  &__range-separator {
+    @apply mx-1;
+  }
+}
+
+$panel: (
+  width: 270px
+);
+
+$header: (
+  height: 40px,
+  header-icon-width: 30px,
+  header-icon-height: 30px
+);
+
+$timePanel: (
+  width: 180px
+);
+
+$timePanelFooter: (
+  height: 36px
+);
+
+@include b('date-picker-panel') {
+  @apply cursor-default;
+  @include set-component-css-var('date-picker', $picker);
+  min-width: #{map.get($panel, width)};
+  &.is-range {
+    min-width: calc(#{map.get($panel, width)} * 2);
+    .#{$ns}-date-picker-panel__content {
+      @apply w-1/2 float-left;
+      &.is-left {
+        border-right: 1px solid #{map.get($picker, 'border-color')}
+      }
+      &.is-right{}
+    }
+    &::after {
+      @apply clear-both;
+    }
+  }
+  &__content {
+    @apply pl-4 pr-4 pb-4;
+  }
+}
+
+@include b('date-picker-panel-header') {
+  @include set-component-css-var('date-picker-panel-header', $header);
+  @apply flex items-center px-2 justify-center select-none;
+  height: getVarCss('date-picker-panel-header', 'height');
+  border-bottom: 1px solid getVarCss('date-picker', 'border-color');
+  &__nav-prev, &__nav-next {
+    width: 50px;
+    @apply flex invisible;
+    &.is-visible {
+      @apply visible;
+    }
+  }
+  &__nav-prev {
+    @apply justify-start;
+  }
+  &__nav-next {
+    @apply justify-end;
+  }
+  &--icon {
+    @apply inline-block text-center cursor-pointer;
+    width: 24px;
+    color: #666;
+    &.is-disabled {
+      @apply cursor-not-allowed;
+      color: getVarCss('c-gray-avg-80');
+    }
+    &:hover:not(.is-disabled) {
+      color: getVarCss('c-primary-active');
+    }
+  }
+  &--icon-rotate {
+    @apply rotate-180;
+  }
+  &__nav-manipulate {
+    @apply flex-1 flex justify-center;
+    font-size: 14px;
+  }
+
+  &__nav-manipulate-year, &__nav-manipulate-month  {
+    @apply px-1 cursor-pointer;
+    &:hover {
+      color: getVarCss('c-primary-active');
+    }
+  }
+  &__nav-manipulate-month {
+    min-width: 40px;
+  }
+}
+@include b('date-picker-panel-body') {
+  $body: &;
+  &__pale {
+    @apply grid grid-cols-7 justify-items-center;
+    &.is-month, &.is-year {
+      @apply grid-cols-3;
+      #{$body}__date {
+        &-inner {
+          @apply w-[56px] leading-6;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+  &__week-day, &__date {
+    @apply flex justify-center items-center mb-1 h-8 w-full;
+    
+  }
+  &__week-day {
+    .item {
+      font-size: 12px;
+    }
+  }
+
+  &__date {
+    &-inner {
+      @apply flex justify-center items-center w-6 h-6;
+      color: getVarCss('c-gray-avg-20');
+      font-size: 12px; 
+      // &:hover:not(.is-next, .is-previous, .is-disabled) {
+      //   background-color: getVarCss('c-date-selected'); 
+      // }
+    }
+    $dateSelt: &;
+    &:not(.is-next, .is-previous, .is-disabled) {
+      &:hover {
+        #{$dateSelt}-inner {
+          background-color: getVarCss('c-date-selected'); 
+        }
+      }
+    }
+    @include cell-states(&);
+  }
+}
+
+@include b('date-picker-panel-footer') {
+  @include set-component-css-var('date-picker-panel-footer', $footer);
+  @apply flex items-center justify-center;
+  height: getVarCss('date-picker-panel-footer', 'height');
+  border-top: 1px solid getVarCss('date-picker', 'border-color');
+  color: getVarCss('c-primary');
+}
+
+
+@include b('date-time-panel-header') {
+  @include set-component-css-var('date-time-panel-header', $dateTimeHeader);
+  @apply flex items-center justify-center pt-2 px-[10px] pb-[5px];
+  border-bottom: 1px solid getVarCss('date-picker', 'border-color');
+  height: getVarCss('date-time-panel-header', 'height');
+  color: getVarCss('c-primary');
+  &__input {
+    @apply ml-[10px];
+  }
+}
+
+@include b('time-panel') {
+  @apply cursor-default;
+  min-width: #{map.get($timePanel, width)};
+}
+
+@include b('time-panel__content') {
+  &::before {
+    @apply absolute left-0 right-0 z-[-1];  
+    content: "";
+    @apply h-8 top-20;
+    margin-right: 12%;
+    margin-left: 12%;
+    border-top: 1px solid  #{map.get($picker, 'border-color')};
+    border-bottom: 1px solid #{map.get($picker, 'border-color')};
+  }
+}
+
+@include b('time-panel__footer') {
+  @apply flex flex-row items-center justify-end pr-4 cursor-pointer;
+  height: #{map.get($timePanelFooter, 'height')};
+  border-top: 1px solid #{map.get($picker, 'border-color')};
+  div:last-child {
+    @apply ml-4;
+    color: getVarCss('c-primary');
+  }
+}
+
+@include b('date-time-panel__footer') {
+  @apply flex flex-row items-center justify-end pr-4 cursor-pointer;
+  height: #{map.get($timePanelFooter, 'height')};
+  border-top: 1px solid #{map.get($picker, 'border-color')};
+  div:last-child {
+    @apply ml-4;
+    color: getVarCss('c-primary');
+  }
+}

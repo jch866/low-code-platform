@@ -1,0 +1,15 @@
+@use './variables.scss' as *;
+
+@include b(tag) {
+  @apply inline-flex  px-2 items-center justify-center py-px;
+  line-height: 24px;
+  font-size: getVarCss('font-size-14');
+  background-color: #F2F3F5;
+  color: getVarCss('c-gray-avg-20');
+  &__close {
+    margin-left: 9px;
+  }
+  &.is-hit {
+    border: 1px solid getVarCss('c-gray-avg-60');
+  }
+}

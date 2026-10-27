@@ -1,0 +1,95 @@
+@use './variables.scss' as *;
+
+$radio: (
+  btn-bg-color: getVarCss('c-white'),
+  btn-border-color:  getVarCss('c-gray-avg-80'),
+  btn-inner-bg-color: getVarCss('c-white'),
+  text-color: getVarCss('c-gray-avg-20'),
+  btn-hover-bg-color: getVarCss('c-white'),
+  btn-hover-border-color:  getVarCss('c-gray-avg-80'),
+  btn-hover-shadow-color:  getVarCss('c-gray-avg-93'),
+  btn-inner-hover-bg-color: getVarCss('c-white'),
+  btn-checked-bg-color: getVarCss('c-white'),
+  btn-checked-border-color:  getVarCss('c-primary'),
+  btn-inner-checked-bg-color: getVarCss('c-primary'),
+);
+
+
+$variantDisabled: (
+  btn-bg-color: getVarCss('c-disabled-fill'),
+  btn-border-color:  getVarCss('c-gray-avg-93'),
+  btn-inner-bg-color: getVarCss('c-disabled-fill'),
+  text-color: getVarCss('c-gray-avg-60'),
+  btn-hover-bg-color: getVarCss('c-disabled-fill'),
+  btn-hover-border-color:  getVarCss('c-gray-avg-93'),
+  btn-hover-shadow-color: transparent,
+  btn-inner-hover-bg-color: getVarCss('c-disabled-fill'),
+  btn-checked-bg-color: getVarCss('c-primary-disabled'),
+  btn-checked-border-color:  getVarCss('c-primary-disabled'),
+  btn-inner-checked-bg-color: getVarCss('c-white'),
+);
+
+@include b('radio') {
+  @include set-component-css-var('radio', $radio);
+  @apply inline-flex justify-start items-center cursor-pointer select-none;
+  color: getVarCss('radio-text-color');
+  &__shape {
+    @apply  relative inline-flex items-center justify-center;
+  }
+  &__faker {
+    @apply block w-[16px] h-[16px] m-auto rounded-full flex-grow-0 flex-shrink-0;
+    @apply relative;
+    border: 1px solid getVarCss('radio-btn-border-color');
+    background-color: getVarCss('radio-btn-bg-color');
+    
+
+    &:after{
+      content: ' ';
+      @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+      @apply w-2 h-2 rounded-full;
+      background-color: getVarCss('radio-btn-inner-bg-color');
+    }
+    &:hover {
+      box-shadow: 0 0 4px 2px getVarCss('radio-btn-hover-shadow-color');
+    }
+  }
+  &__original {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+    @apply -z-10 opacity-0 outline-none appearance-none w-2 h-2;
+  }
+  &__label {
+    @apply flex-1 ml-[6px];
+    color: getVarCss('radion-text-color');
+  }
+  $SLCT: &;
+  &.is-checked {
+    #{$SLCT}__faker {
+      background-color: getVarCss('radio', 'btn-checked-bg-color');
+      
+      border: 1px solid getVarCss('radio','btn-checked-border-color');
+      &:after{
+        background-color: getVarCss('radio-btn-inner-checked-bg-color');
+        @apply w-2 h-2;
+      }
+      :hover {
+        box-shadow: none;
+      }
+    }
+  }
+  // &.is-focus {
+
+  // }
+  &.is-disabled {
+    @include set-component-css-var('radio', $variantDisabled);
+    @apply cursor-not-allowed;
+  }
+  &:not(:last-child) {
+    @apply mr-6;
+  }
+
+}
+
+
+@include b('radio-group') {
+  @apply inline-flex items-center flex-wrap;
+}

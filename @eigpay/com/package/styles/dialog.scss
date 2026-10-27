@@ -1,0 +1,117 @@
+@use 'variables' as *;
+
+$dialog: (
+  'mask-bg-color': rgba(0, 0, 0, 0.5),
+  'content-bg-color': getVarCss('c-white'),
+  'title-color': getVarCss('c-gray-avg-20'),
+  'title-font-size': getVarCss('font-size-18'),
+  'title-line-height': 24px,
+  'header-padding': 16px 32px,
+  'body-padding': 20px 32px,
+  'bottom-padding': 0px 32px 24px 32px,
+  'content-margin-top': 15vh,
+  'contenr-shadow': 0 4px 12px 0 rgba(0, 0, 0, 0.2),
+  'content-default-width': 50%,
+  'content-border-radius': 2px,
+  'close-icon-hover-color': getVarCss('c-primary'),
+  'close-icon-normal-color': getVarCss('c-gray-avg-40'),
+  'close-icon-size': 58px
+);
+
+@include b('dialog') {
+  @include set-component-css-var('dialog', $dialog);
+
+  z-index: 1000;
+  position: relative;
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    overflow: auto;
+    background-color: transparent;
+    &.is-modal {
+      background-color: getVarCss('dialog-mask-bg-color');
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  $SLCT: &;
+  &__content {
+    position: relative;
+    width: getVarCss('dialog-content-default-width');
+    background-color: getVarCss('dialog-content-bg-color');
+    border-radius: getVarCss('dialog-content-border-radius');
+    box-shadow: getVarCss('dialog-contenr-shadow');
+    margin: 0px auto;
+    margin-top: getVarCss('dialog-content-margin-top');
+    &.is-fullscreen {
+      width: 100% !important;
+      margin-top: 0 !important;
+      margin-bottom: 0;
+      height: 100%;
+    }
+    &.is-center {
+      #{$SLCT}__header {
+        text-align: center;
+      }
+      #{$SLCT}__footer {
+        text-align: center;
+      }
+    }
+    &.is-align-center {
+      margin: auto;
+    }
+  }
+
+  &__header {
+    box-sizing: border-box;
+    padding: getVarCss('dialog-header-padding');
+    #{$SLCT}__title {
+      font-size: getVarCss('dialog-title-font-size');
+      font-weight: getVarCss('font-weight-bold');
+      color: getVarCss('dialog-title-color');
+    }
+  }
+
+  &__body {
+    padding: getVarCss('dialog-body-padding');
+  }
+
+  &__footer {
+    padding: getVarCss('dialog-bottom-padding');
+    text-align: right;
+  }
+
+  &__closebtn {
+    position: absolute;
+    right: 10px;
+    top: 0;
+    width: getVarCss('dialog-close-icon-size');
+    height: getVarCss('dialog-close-icon-size');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    .#{$ns}-icon {
+      color: getVarCss('dialog-close-icon-normal-color');
+      font-size: getVarCss('font-size-20');
+    }
+    &:hover {
+      .#{$ns}-icon {
+        color: getVarCss('dialog-close-icon-hover-color');
+      }
+    }
+  }
+}
+
+.#{$ns}-dialog-fade-enter-active,
+.#{$ns}-dialog-fade-leave-active {
+  transition: all 0.3s;
+}
+
+.#{$ns}-dialog-fade-enter-from,
+.#{$ns}-dialog-fade-leave-to {
+  opacity: 0;
+}

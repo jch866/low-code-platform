@@ -1,0 +1,86 @@
+@use './variables.scss' as *;
+@use 'sass:map';
+$picker: (
+  text-color: getVarCss('c-gray-avg-20'),
+  bg-color: getVarCss('c-white'),
+  border-color: getVarCss('c-mix-high-2'),
+  placeholder-color: getVarCss('c-gray-avg-60'),
+  icon-color: getVarCss('c-gray-avg-20'),
+  font-size: getVarCss('font-size-12'),
+  border-radius: getVarCss('border-radius-sm'),
+  max-height: 192px,
+  width: 180px
+);
+$variantHover: (
+  border-color: getVarCss('c-mix-high-2')
+);
+$variantFocus: (
+  border-color: getVarCss('c-primary')
+);
+$variantDisabled: (
+  text-color: getVarCss('c-gray-avg-60'),
+  border-color: getVarCss('c-gray-avg-93'),
+  bg-color: getVarCss('c-gray-avg-93')
+);
+$footer: (
+  height: 36px,
+  font-size: getVarCss('font-size-13')
+);
+
+@include b('time-picker') {
+  @apply flex leading-8 align-middle w-full;
+  &__wrapper {
+    @apply w-full;
+  }
+}
+
+@include b('time-picker-panel') {
+  @apply cursor-default;
+  min-width: #{map.get($picker, width)};
+}
+
+@include b('time-spinner') {
+  @apply grid grid-cols-3 justify-items-center list-none;
+  &__wrapper {
+    @apply text-center w-full cursor-pointer;
+    max-height: #{map.get($picker, max-height)};;
+  }
+  &__list::before,&__list::after {
+    @apply h-20 w-full block;
+    content: "";
+  }
+  &__item {
+    @apply h-8 leading-8;
+    font-size: #{map.get($picker, font-size)};
+    color: getVarCss('c-gray-avg-20');
+    &:hover {
+      background-color: getVarCss('c-date-selected'); 
+    }
+  }
+  .is-active {
+    color: getVarCss('black');
+    font-weight: 700;
+  }
+}
+
+@include b('time-picker-panel__content') {
+  &::before {
+    @apply absolute left-0 right-0 z-[-1];  
+    content: "";
+    @apply h-8 top-20;
+    margin-right: 12%;
+    margin-left: 12%;
+    border-top: 1px solid  #{map.get($picker, 'border-color')};
+    border-bottom: 1px solid #{map.get($picker, 'border-color')};
+  }
+}
+
+@include b('time-picker-panel__footer') {
+  @apply flex flex-row items-center justify-end pr-4 cursor-pointer;
+  height: #{map.get($footer, 'height')};
+  border-top: 1px solid #{map.get($picker, 'border-color')};
+  div:last-child {
+    @apply ml-4;
+    color: getVarCss('c-primary');
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "categories": [
+    {
+      "name": "System",
+      "icons": [
+        "ep-i-hide",
+        "ep-i-view",
+        "ep-i-clip",
+        "ep-i-done",
+        "ep-i-solid-cycle-cross-bold",
+        "ep-i-download",
+        "ep-i-vector",
+        "ep-i-clock",
+        "ep-i-time",
+        "ep-i-home",
+        "ep-i-solid-cycle-smile",
+        "ep-i-icon-16-tishi-baocuotishi",
+        "ep-i-cross",
+        "ep-i-cycle-solid-tick",
+        "ep-i-solid-cycle-cross",
+        "ep-i-cycle-solid-exclamation-mark-inverted",
+        "ep-i-cycle-solid-exclamation-mark",
+        "ep-i-BackTop",
+        "ep-i-back-top-rocket1",
+        "ep-i-back-top-text",
+        "ep-i-tick",
+        "ep-i-minus",
+        "ep-i-back-top-arrow",
+        "ep-i-delete",
+        "ep-i-plus",
+        "ep-i-a-to-left",
+        "ep-i-arrow-to-right",
+        "ep-i-arrow-up",
+        "ep-i-calendar",
+        "ep-i-calendar21",
+        "ep-i-warning",
+        "ep-i-title",
+        "ep-i-sound",
+        "ep-i-soundless",
+        "ep-i-unfold-down",
+        "ep-i-unfold-up"
+      ]
+    }
+  ]
+}

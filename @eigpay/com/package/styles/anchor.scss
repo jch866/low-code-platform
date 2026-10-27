@@ -1,0 +1,80 @@
+@use './variables.scss' as *;
+
+$anchor: (
+  'header-height': 70px,
+  'text-regular-color': getVarCss('c-gray-avg-22'),
+  'text-primary-color': getVarCss('c-primary'),
+  'line-placeholder-color': getVarCss('c-gray-avg-93'),
+  'text-margin-top': 8px,
+  'text-line-height': 22px,
+  'content-padding-left': 19px,
+  'content-width': 200px
+);
+
+@include b('anchor') {
+  @include set-component-css-var('anchor', $anchor);
+
+  &__wraper {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__slot-warppar {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__content {
+    position: sticky;
+    top: getVarCss('anchor-header-height');
+    margin-top: 0;
+    padding: 0px 0px 0px getVarCss('anchor-content-padding-left');
+    width: getVarCss('anchor-content-width');
+    border-left: 2px solid getVarCss('anchor-line-placeholder-color');
+  }
+
+  &__marker {
+    position: absolute;
+    background-color: getVarCss('anchor-text-primary-color');
+    width: 2px;
+    height: getVarCss('anchor-text-line-height');
+    left: -2px;
+    z-index: 0;
+    transition: top 0.25s cubic-bezier(0, 1, 0.5, 1), opacity 0.25s,
+      background-color 0.5s;
+  }
+
+  &__item-wraper {
+    list-style: none;
+    padding: 0;
+  }
+
+  &__item {
+    margin-top: getVarCss('anchor-text-margin-top');
+    line-height: getVarCss('anchor-text-line-height');
+    font-size: getVarCss('font-size-14');
+    color: getVarCss('anchor-text-regular-color');
+    font-weight: getVarCss('font-weight-regular');
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    color: inherit;
+    cursor: pointer;
+
+    &--subitem {
+      padding-left: 1rem;
+    }
+  }
+
+  &__link {
+    position: relative;
+    color: getVarCss('anchor-text-regular-color') !important;
+    transition: 0.3s;
+    &:hover {
+      color: getVarCss('anchor-text-primary-color') !important;
+    }
+    &.is-active {
+      color: getVarCss('anchor-text-primary-color') !important;
+    }
+  }
+}

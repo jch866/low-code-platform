@@ -1,0 +1,162 @@
+@use './variables.scss' as *;
+
+$input: (
+  text-color: getVarCss('c-gray-avg-20'),
+  bg-color: getVarCss('c-white'),
+  border-color: getVarCss('c-mix-high-2'),
+  placeholder-color: getVarCss('c-gray-avg-60'),
+  icon-color: getVarCss('c-gray-avg-20'),
+  font-size: getVarCss('font-size-13') ,
+  border-radius: getVarCss('border-radius-sm'),
+  height: 32px
+);
+$variantHover: (
+  border-color: getVarCss('c-mix-high-2')
+);
+$variantFocus: (
+  border-color: getVarCss('c-primary')
+);
+$variantDisabled: (
+  text-color: getVarCss('c-gray-avg-60'),
+  border-color: getVarCss('c-gray-avg-93'),
+  bg-color: getVarCss('c-gray-avg-93')
+);
+
+@include b('input') {
+  @include set-component-css-var('input', $input);
+  @apply inline-flex w-full leading-8 align-middle text-sm;
+  &__wrapper {
+    @apply inline-flex items-center border-0 px-1 py-[1px] transition-shadow duration-200 w-full;
+    border-radius: getVarCss('input', 'border-radius');
+    border-style: solid;
+    border-width: 1px;
+    border-color: getVarCss('input', 'border-color');
+    // box-shadow: 0 0 0px 1px getVarCss('input', 'border-color') inset;
+    background-color: getVarCss('input', 'bg-color');
+  }
+  &:hover {
+    @include set-component-css-var('input', $variantHover);
+  }
+  &.is-focus {
+    @include set-component-css-var('input', $variantFocus);
+  }
+  &__inner {
+    @include css-var-from-global(('input', 'inner-height'), ('input-height'));
+    @apply flex-grow p-0 outline-0 border-0 w-full;
+    color: getVarCss('input', 'text-color');
+    height: calc(getVarCss('input', 'inner-height') - 4px);
+    line-height: calc(getVarCss('input', 'inner-height') - 4px);
+    font-size: getVarCss('input', 'font-size');
+    &::placeholder {
+      color: getVarCss('input', 'placeholder-color' );
+    }
+    &:focus-visible { // firefox specific
+      outline: none;
+    }
+  }
+  &__prefix {
+    @apply inline-flex shrink-0 whitespace-nowrap h-full text-center pointer-events-none;
+    color: getVarCss('input', 'icon-color');
+    &-inner {
+      @apply inline-flex items-center justify-center pointer-events-auto;
+    }
+  }
+  &__suffix {
+    @apply inline-flex shrink-0 whitespace-nowrap h-full text-center pointer-events-none;
+    color: getVarCss('input', 'icon-color');
+    &-inner {
+      @apply inline-flex items-center justify-center pointer-events-auto;
+      line-height: initial;
+    }
+  }
+  &__count {
+    @apply inline-flex shrink-0 whitespace-nowrap h-full text-center pointer-events-none;
+    color: getVarCss('input', 'icon-color');
+    &-inner {
+      @apply inline-flex items-center justify-center;
+      line-height: initial;
+    }
+  }
+  $SECT: &;
+  &.is-disabled {
+    @include set-component-css-var('input', $variantDisabled);
+    @apply cursor-not-allowed;
+    &:hover {
+      @include set-component-css-var('input', $variantDisabled);
+    }
+    &.is-focus {
+      @include set-component-css-var('input', $variantDisabled);
+    }
+  }
+}
+
+@include b('textarea') {
+  @include set-component-css-var('textarea', $input);
+  @include set-css-var-value(('textarea-height'), 32px);
+  @apply relative inline-block w-full ;
+  font-size: getVarCss('font-size-13');
+  background-color: getVarCss('textarea', 'bg-color');
+  &__wrapper {
+    @apply relative border-0 px-1 py-[1px] transition-shadow duration-200 w-full inline-flex;
+    border-radius: getVarCss('border-radius-sm');
+    border-style: solid;
+    border-width: 1px;
+    border-color: getVarCss('textarea', 'border-color');
+    // box-shadow: 0 0 0px 1px getVarCss('textarea', 'border-color') inset;
+  }
+  &:hover {
+    @include set-component-css-var('textarea', $variantHover);
+  }
+  &.is-focus {
+    @include set-component-css-var('textarea', $variantFocus);
+  }
+  &__inner {
+    @include css-var-from-global(('textarea', 'inner-height'), ('textarea-height'));
+    @apply outline-0 w-full resize-y border-0 appearance-none;
+    color: getVarCss('c-gray-avg-20');
+    height: auto;
+    line-height: calc(getVarCss('textarea', 'inner-height') - 4px);
+    font-size:getVarCss('font-size-13');
+    &::placeholder {
+      color: getVarCss('textarea', 'placeholder-color' );
+    }
+    &::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: getVarCss('c-shadow');
+    }
+  }
+  &__suffix {
+    @apply inline-flex items-center h-full ;
+    @apply absolute right-3  pointer-events-none;
+    color: getVarCss('textarea', 'icon-color');
+    &-inner {
+      @apply inline-flex items-center justify-center pointer-events-auto;
+      line-height: initial;
+    }
+  }
+  
+  &__count {
+    @apply absolute bottom-0.5 right-5;
+    color: getVarCss('textarea', 'icon-color');;
+    font-size: getVarCss('font-size-12');
+    &-inner {
+      @apply inline-flex items-center justify-center;
+      line-height: initial;
+    }
+  }
+  $SECT: &;
+  &.is-disabled {
+    @include set-component-css-var('textarea', $variantDisabled);
+    @apply cursor-not-allowed;
+    &:hover {
+      @include set-component-css-var('textarea', $variantDisabled);
+    }
+    &.is-focus {
+      @include set-component-css-var('textarea', $variantDisabled);
+    }
+  }
+}
+ 

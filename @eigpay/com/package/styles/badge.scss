@@ -1,0 +1,114 @@
+@use 'variables' as *;
+
+$badge: (
+  'border-radius': 10px,
+  'content-size': 18px,
+  'content-height': 18px,
+  'dot-size': 8px,
+  'content-bg-color': getVarCss('c-white'),
+  'color-success': getVarCss('c-success'),
+  'color-error': getVarCss('c-error'),
+  'color-warning': getVarCss('c-warning'),
+  'color-processing': getVarCss('c-primary'),
+  'color-default': getVarCss('c-mix-high-3')
+);
+
+@include b('badge') {
+  @include set-component-css-var('badge', $badge);
+
+  position: relative;
+  display: inline-block;
+  &__content {
+    background-color: getVarCss('badge-content-bg-color');
+    border-right: getVarCss('badge-border-radius');
+    color: getVarCss('c-white');
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: getVarCss('font-size-12');
+    font-weight: getVarCss('font-weight-regular');
+    height: getVarCss('badge-content-height');
+    line-height: getVarCss('badge-content-height');
+    padding: 0 6px;
+    white-space: nowrap;
+    border: 1px solid getVarCss('badge-content-bg-color');
+    border-radius: calc((getVarCss('badge-content-height')) / 2);
+
+    &.is-fixed {
+      position: absolute;
+      top: 0;
+      right: calc(1px + getVarCss('badge-content-size') / 2);
+      transform: translateY(-50%) translateX(100%);
+    }
+
+    &.is-dot {
+      width: getVarCss('badge-dot-size');
+      height: getVarCss('badge-dot-size');
+      padding: 0;
+      right: 0;
+      border-radius: 50%;
+    }
+
+    &.is-top {
+      position: absolute;
+      top: 0;
+      left: calc(50% - getVarCss('badge-dot-size') / 2);
+      transform: translateY(-50%);
+    }
+
+    &.is-left {
+      position: absolute;
+      top: calc(50% - getVarCss('badge-dot-size') / 2);
+      left: 0;
+      transform: translateX(-50%);
+    }
+
+    &.is-right {
+      position: absolute;
+      top: calc(50% - getVarCss('badge-dot-size') / 2);
+      right: 0;
+      transform: translateX(50%);
+    }
+
+    &.is-bottom {
+      position: absolute;
+      bottom: 0;
+      left: calc(50% - getVarCss('badge-dot-size') / 2);
+      transform: translateY(50%);
+    }
+
+    &.is-top-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translateY(-50%) translateX(-50%);
+    }
+
+    &.is-top-right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      transform: translateY(-50%) translateX(50%);
+    }
+
+    &.is-bottom-left {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      transform: translateY(50%) translateX(-50%);
+    }
+
+    &.is-bottom-right {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      transform: translateY(50%) translateX(50%);
+    }
+
+    @each $type in (success, error, warning, processing, default) {
+      &--#{$type} {
+        background-color: getVarCss('badge-color', $type);
+      }
+    }
+  }
+}

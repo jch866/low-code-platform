@@ -1,0 +1,49 @@
+@use './variables.scss' as *;
+
+$card: (
+  'border-color': getVarCss('c-mix-high-2'),
+  'bg-color': getVarCss('c-white'),
+  'text-color-primary': getVarCss('c-text-primary'),
+  'header-font-size': getVarCss('font-size-14'),
+  'transition-duration': 0.3s,
+  'box-show-light': 0 2px 4px 0 rgba(118, 133, 182, 0.25),
+  'body-padding': 16px,
+  'header-padding': 12px 16px,
+  'border': 1px solid getVarCss('card-border-color')
+);
+
+@include b('card') {
+  @include set-component-css-var('card', $card);
+
+  border: getVarCss('card-border');
+  background-color: getVarCss('card-bg-color');
+  overflow: hidden;
+  color: getVarCss('card-text-color-primary');
+  transition: getVarCss('card-transition-duration');
+
+  &__header {
+    padding: getVarCss('card-header-padding');
+    border-bottom: getVarCss('card-border');
+    font-size: getVarCss('card-header-font-size');
+    box-sizing: border-box;
+  }
+
+  &__body {
+    padding: getVarCss('card-body-padding');
+  }
+
+  &.is-always-shadow {
+    box-shadow: getVarCss('card-box-show-light');
+  }
+
+  &.is-never-shadow {
+    box-shadow: none;
+  }
+
+  &.is-hover-shadow {
+    &:hover,
+    &:focus {
+      box-shadow: getVarCss('card-box-show-light');
+    }
+  }
+}

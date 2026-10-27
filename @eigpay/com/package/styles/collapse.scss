@@ -1,0 +1,93 @@
+@use './variables.scss' as *;
+
+$collapse: (
+  'border-color': rgba(0, 0, 0, 0.09),
+  'header-bg-color': rgba(0, 0, 0, 0.02),
+  'border-radius': 4px,
+  'header-height': 46px,
+  'text-color-disabled': getVarCss('c-mix-high-3'),
+  'header-text-color': getVarCss('c-gray-avg-20'),
+  'header-font-size': getVarCss('font-size-14'),
+  'content-bg-color': getVarCss('c-white'),
+  'content-font-size': getVarCss('font-size-14'),
+  'content-text-color': getVarCss('c-gray-avg-20'),
+  'arrow-font-size': getVarCss('font-size-12'),
+  'arrow-marin': 0px 12px 0px 16px,
+  'content-padding': 16px
+);
+
+$collapseline: (
+  'header-bg-color': #fff,
+  'border-radius': none
+);
+
+@include b('collapse') {
+  @include set-component-css-var('collapse', $collapse);
+  border: 1px solid getVarCss('collapse-border-color');
+  border-radius: getVarCss('collapse-border-radius');
+
+  &.is-default {
+    overflow: hidden;
+  }
+  &.is-line {
+    @include set-component-css-var('collapse', $collapseline);
+    border: none;
+  }
+}
+
+@include b('collapse-item') {
+  $SLCT: &;
+  &.is-disabled {
+    #{$SLCT}__header {
+      cursor: not-allowed;
+      color: getVarCss('collapse-text-color-disabled');
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    height: getVarCss('collapse-header-height');
+    background-color: getVarCss('collapse-header-bg-color');
+    color: getVarCss('collapse-header-text-color');
+    border-bottom: 1px solid getVarCss('collapse-border-color');
+    font-size: getVarCss('collapse-header-font-size');
+    transition: border-bottom-color 0.3s;
+    outline: none;
+
+    #{$SLCT}__arrow {
+      margin: getVarCss('collapse-arrow-marin');
+      transition: transform 0.3s;
+      font-size: getVarCss('collapse-arrow-font-size');
+      &.is-active {
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  &__wrap {
+    will-change: height;
+    background-color: getVarCss('collapse-content-bg-color');
+    overflow: hidden;
+    box-sizing: border-box;
+    border-bottom: 1px solid getVarCss('collapse-border-color');
+  }
+
+  &__content {
+    padding: getVarCss('collapse-content-padding');
+    font-size: getVarCss('collapse-content-font-size');
+    color: getVarCss('collapse-content-text-color');
+    line-height: 1.7;
+  }
+
+  &:last-child {
+    margin-bottom: -1px;
+  }
+}
+
+.#{$ns}-collapse-transition-leave-active,
+.#{$ns}-collapse-transition-enter-active {
+  transition: 0.3s max-height ease-in-out, 0.3s padding-top ease-in-out,
+    0.3s padding-bottom ease-in-out;
+}

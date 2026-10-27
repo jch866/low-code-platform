@@ -1,0 +1,49 @@
+@use 'sass:math';
+@use './variables.scss' as *;
+@use './var_colors.scss' as *;
+$base-font-size: 16;
+
+$rootVars: (
+  'c-date-selected': #f2f3f5,
+
+  'c-text-primary': getVarCss('c-gray-avg-20'),
+  'c-text-secondary': getVarCss('c-gray-avg-22'),
+  'c-text-adjunct': getVarCss('c-gray-avg-60'),
+  'c-text-table-header': getVarCss('c-gray-avg-22'),
+  'c-text-disable': getVarCss('c-mix-high-3'),
+  'c-shape-selection': getVarCss('c-mix-high-3'),
+  'c-border': getVarCss('c-mix-high-3'),
+  'c-input-text': getVarCss('c-gray-avg-87'),
+  'c-input-border': getVarCss('c-mix-high-2'),
+  'c-select-border': getVarCss('c-gray-avg-87'),
+  'c-divider-light': getVarCss('c-info'),
+  'c-pagination-text': getVarCss('c-gray-avg-40'),
+  'font-weight-light': 200,
+  'font-weight-regular': 400,
+  'font-weight-bold': 700,
+
+  'border-radius-sm': 2px,
+  'border-radius-base': 4px,
+
+  'font-size-12': #{math.div(12, $base-font-size)}rem,
+  'font-size-13': #{math.div(13, $base-font-size)}rem,
+  'font-size-14': #{math.div(14, $base-font-size)}rem,
+  'font-size-16': #{math.div(16, $base-font-size)}rem,
+  'font-size-18': #{math.div(18, $base-font-size)}rem,
+  'font-size-20': #{math.div(20, $base-font-size)}rem,
+  'font-size-24': #{math.div(24, $base-font-size)}rem,
+  'font-size-36': #{math.div(36, $base-font-size)}rem,
+  'font-size-48': #{math.div(48, $base-font-size)}rem,
+  'font-size-56': #{math.div(56, $base-font-size)}rem
+);
+
+:root {
+  @include set-component-css-var('c', $color);
+  @include set-component-css-var('', $rootVars);
+
+  font-family: 'Microsoft YaHei', SimSun, sans-serif, Airal, Helvetica Neue,
+    Helvetica;
+  // font-size variables
+  font-size: #{$base-font-size}px;
+  font-weight: getVarCss('font-weight-regular');
+}

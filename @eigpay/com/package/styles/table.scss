@@ -1,0 +1,209 @@
+@use './variables.scss' as *;
+$table: (
+  'border-color': getVarCss('c-info'),
+  'border': 1px solid getVarCss('c-info'),
+  'text-color': getVarCss('c-gray-avg-22'),
+  'header-text-color': getVarCss('c-gray-avg-20'),
+  'row-hover-bg-color': getVarCss('c-info-disabled'),
+  'current-row-bg-color': getVarCss('mix-high-1'),
+  'header-bg-color': getVarCss('c-info'),
+  'fixed-box-shadow': rgb(0 0 0 / 15%),
+  'bg-color': getVarCss('c-white'),
+  'tr-bg-color': getVarCss('c-white'),
+  'expanded-cell-bg-color': getVarCss('c-white'),
+  'fixed-left-column': inset 10px 0 10px -10px rgb(0 0 0 / 15%),
+  'fixed-right-column': inset -10px 0 10px -10px rgb(0 0 0 / 15%),
+  'font-size': getVarCss('font-size-14')
+);
+
+$table-padding: (
+  'large': 12px 0,
+  'default': 8px 0,
+  'small': 4px 0
+);
+
+$table-cell-padding: (
+  'large': 0 16px,
+  'default': 0 12px,
+  'small': 0 8px
+);
+
+@mixin fixed {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  opacity: 1;
+  // background-color: getVarCss('table-bg-color');
+}
+
+@mixin border-pseudo {
+  content: '';
+  position: absolute;
+  background-color: getVarCss('table-border-color');
+  z-index: 3;
+}
+@include b(table) {
+  @include set-component-css-var('table', $table);
+  @apply relative overflow-hidden box-border h-fit w-full max-w-full;
+  background-color: getVarCss('table-bg-color');
+  font-size: getVarCss('table-font-size');
+  color: getVarCss('table-text-color');
+  &__inner-wrapper {
+    @apply relative flex flex-col h-full;
+    overflow: hidden;
+    &::before {
+      @apply left-0 bottom-0 w-full h-px;
+      @include border-pseudo();
+    }
+  }
+  &__header-wrapper {
+    @apply flex-shrink-0;
+    overflow: hidden;
+    // &.is-fixed {
+    //   @apply sticky top-0 z-10 opacity-100;
+    // }
+  }
+  &__header {
+    table-layout: fixed;
+    border-collapse: separate;
+  }
+  &__body-wrapper {
+    @apply flex-1 overflow-hidden;
+  }
+
+  &__cell {
+    @apply py-4 min-w-0 box-border text-ellipsis align-middle relative text-left z-[1];
+    @apply transition-colors;
+    border-bottom: 1px solid getVarCss('table-border-color');
+    background-color: getVarCss('table-bg-color');
+    .cell {
+      @apply px-3 break-words overflow-hidden;
+    }
+    .cell.is-eye {
+      display: inline-flex;
+      align-items: center;
+    }
+    @each $position in (center, right) {
+      &.is-#{$position} {
+        text-align: $position;
+      }
+    }
+  }
+   &-popper {
+       max-width: 50%;
+   }
+
+  th#{&}__cell {
+    @apply py-3;
+    color: getVarCss('table-header-text-color');
+    background-color: getVarCss('table-header-bg-color');
+    font-weight: 400;
+  }
+  $block: &;
+  @include m(enable-row-hover) {
+    &#{$block} #{$block}__body {
+      tr {
+        &:hover {
+          & > td#{$block}__cell:not(#{$block}__expanded-cell) {
+            background-color: getVarCss('table-row-hover-bg-color');
+          }
+        }
+      }
+    }
+  }
+  &__empty-block {
+    @apply w-full py-4 flex items-center justify-center sticky left-0 min-h-[50px];
+  }
+  &__empty-figure {
+    @apply bg-center bg-cover;
+    width: 60px;
+    height: 60px;
+    background-image: url('./img/no-data.png');
+  }
+  &__empty-text {
+    @apply leading-[18px];
+    color: getVarCss('c-mix-high-3');
+  }
+  @include m(striped) {
+    #{$block}__body {
+      tr:nth-child(even) {
+        & > td#{$block}__cell {
+          background-color: getVarCss('table-border-color');
+        }
+      }
+    }
+  }
+
+  @include m(border) {
+    &::before {
+      @apply absolute top-0 bottom-0 left-0 w-px h-full;
+      @include border-pseudo();
+    }
+    &::after {
+      @apply absolute top-0 bottom-0 right-0 w-px h-full;
+      @include border-pseudo();
+    }
+    #{$block}__inner-wrapper {
+      &::after {
+        @apply left-0 top-0 w-full h-px;
+        @include border-pseudo();
+      }
+    }
+    #{$block}__cell {
+      border-right: 1px solid getVarCss('table-border-color');
+    }
+  }
+
+  &.is-scrolling-left,
+  &.is-scrolling-middle,
+  &.is-scrolling-right {
+    #{$block}__column-fixed-left,
+    #{$block}__column-fixed-right {
+      @include fixed();
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 10px;
+        bottom: -1px;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        box-shadow: none;
+        touch-action: none;
+        pointer-events: none;
+      }
+    }
+    #{$block}__column-fixed-left {
+      left: 0;
+      &::before {
+        left: unset;
+        right: -10px;
+        box-shadow: getVarCss('table-fixed-left-column');
+      }
+    }
+    #{$block}__column-fixed-right {
+      right: 0;
+      &::before {
+        box-shadow: getVarCss('table-fixed-right-column');
+      }
+    }
+  }
+  &.is-scrolling-left {
+    #{$block}__column-fixed-left {
+      &::before {
+        display: none;
+      }
+    }
+  }
+  &.is-scrolling-right {
+    #{$block}__column-fixed-right {
+      &::before {
+        display: none;
+      }
+    }
+  }
+  @include m(tooltip) {
+    @apply text-ellipsis whitespace-nowrap;
+  }
+}

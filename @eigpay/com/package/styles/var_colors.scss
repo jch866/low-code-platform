@@ -1,0 +1,52 @@
+// 
+@use 'sass:color';
+$color: (
+  white: #FFFFFF,
+  black: #000000,
+  black-o-90: color.change(#000000, $alpha: 0.9), // black alpha 90%
+  black-o-50: color.change(#000000, $alpha: 0.5), // black alpha 50%
+  gray-avg-20: #333333, // 'composed of 20.0% red, 20.0% green and 20.0% blue'
+  gray-avg-20-o-30: color.change(#333333, $alpha: 0.3), // 'composed of 20.0% red, 20.0% green and 20.0% blue, and alpha 0.3'
+  gray-avg-22: #383838, // 'composed of 22.0% red, 22.0% green and 22.0% blue'
+  gray-avg-40: #666666, // 'composed of 40.0% red, 40.0% green and 40.0% blue'
+  gray-avg-60: #999999, // 'composed of 60.0% red, 60.0% green and 60.0% blue'
+  gray-avg-80: #CCCCCC, // 'composed of 80.0% red, 80.0% green and 80.0% blue'
+  gray-avg-87: #DDDDDD, // 'composed of 86.7% red, 86.7% green and 86.7% blue'
+  gray-avg-93: #EEEEEE, // 'composed of 93.3% red, 93.3% green and 93.3% blue'
+  gray-avg-95: #F2F2F2, // 'composed of 94.9% red, 94.9% green and 94.9% blue'
+  gray-avg-98: #FBFBFB, // 'composed of 98.4% red, 98.4% green and 98.4% blue'
+  primary: #0163CA,
+  primary-hover: #1A72CF,
+  primary-active:  #005BBB,
+  primary-disabled: #80B1E5,
+  primary-visited: #4D91D9,
+  success: #00B42A,
+  success-hover: #19BB3F,
+  success-acitve: #00AD28,
+  success-disabled: #7FD994,
+  success-visited:  #4CCA69,
+  error: #F53F3F,
+  error-hover: #F65252,
+  error-acitve: #EE3A3A,
+  error-disabled: #FA9F9F,
+  error-visited: #F87878,
+  warning: #FF7D00,
+  warning-hover: #FF8A19,
+  warning-active: #E87200,
+  warning-disabled: #FFBE7F,
+  warning-visited: #FFA44C,
+  info: #F0F3FA,
+  info-hover: #F2F5FB,
+  info-active: #F1F5FF,
+  info-disabled: #F5F7FC,
+  // info-visited: '',
+  base-red-1: #FFB400, // composed of 100.0% red, 70.6% green and 0.0% blue
+  base-blue-1: #94BFFF,  // composed of 58% red, 74.9% green and 100% blue
+  base-blue-2: #EFF4FF, // composed of 93.7% red, 95.7% green and 100% blue
+  mix-high-1: #F7F8FA, // composed of 96.9% red, 97.3% green and 98% blue
+  mix-high-2: #DCE0EC, // composed of 86.3% red, 87.8% green and 92.5% blue
+  mix-high-3: #C9CDD4, //  composed of 78.8% red, 80.4% green and 83.1% blue
+  shadow: color.change(#7685B6, $alpha: 0.25),  // composed of 46.3% red, 52.2% green and 71.4% blue, alpha 0.25
+  disabled-fill: #F2F2F2
+);
+

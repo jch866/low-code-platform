@@ -1,0 +1,120 @@
+@use './variables.scss' as *;
+
+$popper: (
+  width: fit-content,
+  min-width: 10px,
+  c-gray-light: getVarCss('c-shadow'),
+  custom-arrow-bg: none
+);
+
+$arrow: (
+  width: 10px
+);
+
+@include b('popper') {
+  $arrow-selector: #{& + '__arrow'};
+
+  @include set-component-css-var('popper', $popper);
+  @apply absolute z-10 cursor-pointer rounded break-all px-4 py-2;
+  width: getVarCss('popper', 'width');
+  min-width: getVarCss('popper', 'min-width');
+  &.is-dark {
+    box-shadow: 0 2px 8px 0 getVarCss('c-black');
+    background-color: getVarCss('c-black');
+    color: getVarCss('c-white');
+  }
+  &.is-light {
+    box-shadow: 0 2px 8px 0 getVarCss('popper', 'c-gray-light');
+    background-color: getVarCss('c-white');
+    color: getVarCss('c-gray-dark-3');
+  }
+  &.is-pure {
+    padding: 0;
+  }
+  &__arrow {
+    @include set-component-css-var('arrow', $arrow);
+    @apply absolute;
+    width: getVarCss('arrow', 'width');
+    height: getVarCss('arrow', 'width');
+    z-index: -1;
+    &.is-dark {
+      &::before {
+        background-color: getVarCss('c-black');
+        border: 1px solid getVarCss('c-black');
+      }
+    }
+    &.is-light {
+      &::before {
+        background-color: getVarCss('c-white');
+        border: 1px solid getVarCss('popper', 'c-gray-light');
+      }
+    }
+    &.is-custom {
+      &::before {
+        background-color: getVarCss('popper', 'custom-arrow-bg');
+        border: 1px solid getVarCss('popper', 'custom-arrow-bg');
+      }
+    }
+    &::before {
+      @apply absolute;
+      width: getVarCss('arrow', 'width');
+      height: getVarCss('arrow', 'width');
+      z-index: -1;
+      content: ' ';
+      transform: rotate(45deg);
+      background: getVarCss('c-white');
+      box-sizing: border-box;
+    }
+  }
+
+  $placements: (
+    'top': 'bottom',
+    'bottom': 'top',
+    'left': 'right',
+    'right': 'left'
+  );
+
+  @each $placement, $opposite in $placements {
+    &[data-popper-placement^='#{$placement}'] > #{$arrow-selector} {
+      #{$opposite}: -5px;
+
+      &::before {
+        @if $placement == top {
+          border-bottom-right-radius: 2px;
+        }
+        @if $placement == bottom {
+          border-top-left-radius: 2px;
+        }
+        @if $placement == left {
+          border-top-right-radius: 2px;
+        }
+        @if $placement == right {
+          border-bottom-left-radius: 2px;
+        }
+      }
+    }
+  }
+
+  @each $placement,
+    $adjacency
+      in ('top': 'left', 'bottom': 'right', 'left': 'bottom', 'right': 'top')
+  {
+    &[data-popper-placement^='#{$placement}'] {
+      #{$arrow-selector}::before {
+        border-#{$placement}-color: transparent !important;
+        border-#{$adjacency}-color: transparent !important;
+      }
+    }
+  }
+}
+
+@include b('popper-expand') {
+  &-enter-active,
+  &-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+  }
+}

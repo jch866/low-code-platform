@@ -1,0 +1,140 @@
+@use './variables.scss' as *;
+
+$progress: (
+  'color-placeholder': getVarCss('c-gray-avg-93'),
+  'text-color-normal': getVarCss('c-gray-avg-40'),
+  'font-size-12': getVarCss('font-size-12'),
+  'font-size-14': getVarCss('font-size-14'),
+  'bg-color': getVarCss('c-primary'),
+  'bar-default-height': 6px,
+  'text-min-width': 50px,
+  'border-radius': 100px
+);
+
+$progressPaused: (
+  'text-color-normal': getVarCss('c-mix-high-3'),
+  'bg-color': getVarCss('c-mix-high-3')
+);
+
+$progressWarning: (
+  'text-color-normal': getVarCss('c-warning'),
+  'bg-color': getVarCss('c-warning')
+);
+
+$progressError: (
+  'text-color-normal': getVarCss('c-error'),
+  'bg-color': getVarCss('c-error')
+);
+
+$progressSuccess: (
+  'text-color-normal': getVarCss('c-success'),
+  'bg-color': getVarCss('c-success')
+);
+
+@include b('progress') {
+  @include set-component-css-var('progress', $progress);
+
+  position: relative;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+
+  &.is-paused {
+    @include set-component-css-var('progress', $progressPaused);
+  }
+
+  &.is-error {
+    @include set-component-css-var('progress', $progressError);
+  }
+
+  &.is-warning {
+    @include set-component-css-var('progress', $progressWarning);
+  }
+
+  &.is-success {
+    @include set-component-css-var('progress', $progressSuccess);
+  }
+
+  &__text {
+    font-size: getVarCss('progress-font-size-14');
+    color: getVarCss('progress-text-color-normal');
+    margin-left: 5px;
+    min-width: getVarCss('progress-text-min-width');
+    line-height: 1;
+    i {
+      display: block;
+    }
+  }
+
+  $SLCT: &;
+  &--circle,
+  &--dashboard {
+    display: inline-block;
+    #{$SLCT}__text {
+      color: getVarCss('progress-text-color-normal');
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      margin: 0;
+      transform: translate(0, -50%);
+      i {
+        display: block;
+      }
+    }
+  }
+
+  &--without-text {
+    #{$SLCT}__text {
+      display: none;
+    }
+    #{$SLCT}-bar {
+      padding-right: 0;
+      margin-right: 0;
+      display: block;
+    }
+  }
+
+  &--text-inside {
+    #{$SLCT}-bar {
+      padding-right: 0;
+      margin-right: 0;
+    }
+  }
+
+  &-bar {
+    flex-grow: 1;
+    box-sizing: border-box;
+
+    &__outer {
+      height: getVarCss('progress-bar-default-height');
+      border-radius: getVarCss('progress-border-radius');
+      background-color: getVarCss('progress-color-placeholder');
+      overflow: hidden;
+      position: relative;
+      vertical-align: middle;
+    }
+
+    &__inner {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background-color: getVarCss('progress-bg-color');
+      text-align: right;
+      border-radius: getVarCss('progress-border-radius');
+      line-height: 1;
+      white-space: nowrap;
+      transition: with 0.6s ease;
+    }
+
+    &__innerText {
+      display: inline-block;
+      vertical-align: middle;
+      color: getVarCss('c-white');
+      font-size: getVarCss('progress-font-size-12');
+      margin: 0 5px;
+    }
+  }
+}

@@ -1,0 +1,67 @@
+@use './variables.scss' as *;
+
+@include b('form') {
+  @include m('label-top') {
+    .#{bem('form-item')} {
+      @apply block;
+      .#{bem('form-item', 'label')} {
+        @apply justify-start;
+      }
+    }
+  }
+  @include m('label-left') {
+    .#{bem('form-item')} {
+      .#{bem('form-item', 'label')} {
+        @apply justify-start;
+      }
+    }
+  }
+}
+@include b('form-item') {
+  @apply flex mb-6;
+  $SLCT: &;
+  &__label {
+    @apply flex-auto flex-shrink-0 flex-grow-0;
+    @apply h-8;
+    @apply text-sm leading-8 pr-4;
+    @apply inline-flex items-center justify-end;
+  }
+  &__content {
+    min-width: 0;
+    @apply flex-auto flex items-center leading-8;
+    @apply relative;
+    &__error-msg {
+      @apply absolute left-0 top-full;
+      @apply text-sm;
+      color: getVarCss('c-error');
+    }
+  }
+
+  &.is-required {
+    #{$SLCT}__label {
+      &::before {
+        content: '*';
+        color: getVarCss('c-error');
+      }
+    }
+  }
+  &.is-error {
+    .#{bem('input', 'wrapper')},
+    .#{bem('textarea', 'wrapper')} {
+      // box-shadow: 0 0 1px 1px getVarCss('c-error');
+      border-color: getVarCss('c-error');
+    }
+  }
+  &-error-enter-active,
+  &-error-leave-active {
+    opacity: 1;
+    transform: scaleY(1);
+    transition: all 0.1s ease-in-out;
+    transform-origin: center top;
+  }
+  &-error-enter-from,
+  &-error-leave-to {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}

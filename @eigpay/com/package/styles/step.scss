@@ -1,0 +1,266 @@
+@use './variables.scss' as *;
+
+$step: (
+  'line-color-hight': getVarCss('c-primary'),
+  'line-color-normal': getVarCss('c-mix-high-3'),
+  'title-color-hight': getVarCss('c-gray-avg-20'),
+  'title-color-normal': getVarCss('c-gray-avg-60'),
+  'description-color': getVarCss('c-gray-avg-60'),
+  'number-color-normal': getVarCss('c-mix-high-3'),
+  'number-color-hight': getVarCss('c-white'),
+  'finish-bg-color': getVarCss('c-primary'),
+  'process-bg-color': getVarCss('c-primary'),
+  'wait-bg-color': getVarCss('c-white'),
+  'wait-border': 1px solid getVarCss('c-mix-high-3'),
+  'text-white': getVarCss('c-white'),
+  'font-size-12': getVarCss('font-size-12'),
+  'font-size-16': getVarCss('font-size-16'),
+  'font-weight-400': getVarCss('font-weight-regular'),
+  'margin-horizontal': 0 4px,
+  'margin-vertical': 4px 0,
+  'line-height-20': 20px,
+  'line-height-24': 24px,
+  'title-margin-top': 7px,
+  'icon-width': 26px,
+  'dot-margin': 4px,
+  'icon-border-radius': 50%
+);
+
+$stepDot: (
+  'finish-bg-color': getVarCss('c-primary'),
+  'process-bg-color': getVarCss('c-primary'),
+  'wait-bg-color': getVarCss('c-mix-high-3'),
+  'icon-width': 8px,
+  'wait-border': none
+);
+
+$stepSqure: (
+  'finish-bg-color': getVarCss('c-primary'),
+  'process-bg-color': getVarCss('c-primary'),
+  'wait-bg-color': getVarCss('c-mix-high-3'),
+  'icon-width': 8px,
+  'wait-border': none,
+  'icon-border-radius': none
+);
+
+@include b('step') {
+  display: flex;
+
+  &--horizontal {
+    white-space: nowrap;
+  }
+
+  &--vertical {
+    height: 100%;
+    flex-flow: column;
+  }
+}
+
+@include b('step-item') {
+  @include set-component-css-var('step', $step);
+  position: relative;
+  flex-shrink: 1;
+
+  &__head {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    &.is-wait {
+      color: getVarCss('step-title-color-normal');
+    }
+    &.is-process {
+      color: getVarCss('step-text-white');
+    }
+    &.is-finish {
+      color: getVarCss('step-title-color-hight');
+    }
+  }
+
+  &__icon {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: getVarCss('step-icon-width');
+    height: getVarCss('step-icon-width');
+    box-sizing: border-box;
+    background: getVarCss('step-wait-bg-color');
+    flex-shrink: 0;
+    border: none;
+    &.is-wait {
+      background: getVarCss('step-wait-bg-color');
+      color: getVarCss('step-number-color-normal');
+      border: getVarCss('step-wait-border');
+    }
+    &.is-process {
+      background: getVarCss('step-process-bg-color');
+      color: getVarCss('step-number-color-hight');
+    }
+    &.is-finish {
+      background: getVarCss('step-finish-bg-color');
+      color: getVarCss('step-number-color-hight');
+    }
+
+    &.is-text {
+      border-radius: getVarCss('step-icon-border-radius');
+    }
+    &.is-icon {
+      border-radius: getVarCss('step-icon-border-radius');
+    }
+  }
+
+  &__icon-inner {
+    display: inline-block;
+    text-align: center;
+    line-height: 1;
+    color: inherit;
+  }
+
+  &__line {
+    height: 1px;
+    flex-grow: 1;
+    margin-left: getVarCss('step-dot-margin');
+    margin-right: getVarCss('step-dot-margin');
+    background: getVarCss('step-line-color-normal');
+  }
+
+  &__line-inner {
+    display: block;
+    background: getVarCss('step-line-color-hight');
+    box-sizing: border-box;
+  }
+
+  &__main {
+    white-space: normal;
+    text-align: left;
+  }
+
+  &__title {
+    font-size: getVarCss('step-font-size-16');
+    color: getVarCss('step-title-color-hight');
+    font-weight: getVarCss('step-font-weight-400');
+    line-height: getVarCss('step-line-height-24');
+    margin-top: getVarCss('step-title-margin-top');
+
+    &.is-process {
+      color: getVarCss('step-title-color-hight');
+    }
+    &.is-wait {
+      color: getVarCss('step-title-color-normal');
+    }
+    &.is-finish {
+      color: getVarCss('step-title-color-hight');
+    }
+  }
+
+  &__description {
+    font-size: getVarCss('step-font-size-12');
+    color: getVarCss('step-description-color');
+    font-weight: getVarCss('step-font-weight-400');
+    line-height: getVarCss('step-line-height-20');
+    &.is-process {
+      color: getVarCss('step-title-color-hight');
+    }
+    &.is-wait {
+      color: getVarCss('step-description-color');
+    }
+    &.is-finish {
+      color: getVarCss('step-title-color-hight');
+    }
+  }
+
+  $SLCT: &;
+  &:last-of-type {
+    #{$SLCT}__line {
+      display: none;
+    }
+    &.is-flex {
+      flex-basis: auto !important;
+      flex-shrink: 0;
+      flex-grow: 0;
+    }
+    #{$SLCT}__main {
+      padding-right: 0;
+    }
+    #{$SLCT}__description {
+      padding-right: 0;
+    }
+  }
+
+  &.is-horizontal {
+    display: inline-block;
+  }
+
+  &.is-vertical {
+    display: flex;
+
+    #{$SLCT}__head {
+      flex-direction: column;
+      width: getVarCss('step-icon-width');
+    }
+
+    #{$SLCT}__main {
+      padding-left: 10px;
+      flex-grow: 1;
+    }
+
+    #{$SLCT}__title {
+      margin-top: 0;
+    }
+
+    #{$SLCT}__line {
+      width: 1px;
+      margin-top: getVarCss('step-dot-margin');
+      margin-bottom: getVarCss('step-dot-margin');
+    }
+  }
+
+  &.is-center {
+    #{$SLCT}__head {
+      justify-content: center;
+    }
+
+    #{$SLCT}__main {
+      text-align: center;
+    }
+
+    #{$SLCT}__line {
+      position: absolute;
+      top: calc(getVarCss('step-icon-width') / 2 - 1px);
+      left: calc(
+        50% + getVarCss('step-icon-width') / 2 + getVarCss('step-dot-margin')
+      );
+      right: calc(
+        -50% + getVarCss('step-icon-width') / 2 + getVarCss('step-dot-margin')
+      );
+    }
+  }
+
+  &.is-straight {
+    #{$SLCT}__main {
+      display: none;
+    }
+
+    #{$SLCT}__title {
+      margin-top: 0;
+      margin-left: 8px;
+    }
+  }
+
+  &.is-dot {
+    @include set-component-css-var('step', $stepDot);
+    #{$SLCT}__icon-inner {
+      display: none;
+    }
+  }
+
+  &.is-square {
+    @include set-component-css-var('step', $stepSqure);
+    #{$SLCT}__icon-inner {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+@use './variables.scss' as *;
+
+$popover: (
+  height: 30px,
+);
+
+$title: (
+  border-color:  rgba(0,0,0,0.09)
+);
+
+@include b('popover') {
+  @include set-component-css-var('popover', $popover);
+  @apply inline-flex w-full leading-8 align-middle text-sm cursor-pointer relative;
+  // height: getVarCss('popover', 'height');
+  &__title {
+    @include set-component-css-var('title', $title);
+    width: 100%;
+    &.is-dark {
+      border-bottom: 1px solid getVarCss('c-white')
+    }
+    &.is-light {
+      border-bottom: 1px solid getVarCss('title', 'border-color')
+    }
+  }
+}

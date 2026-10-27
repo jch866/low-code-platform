@@ -1,0 +1,97 @@
+@use './variables.scss' as *;
+
+$switch: (
+ color: getVarCss('c-gray-avg-20'),
+ active-color: getVarCss('c-primary'),
+ height: 24px,
+ border-radius: calc(getVarCss('switch-height') / 2),
+ min-width: 40px,
+ border-color: getVarCss('c-gray-avg-80'),
+ bg-color: getVarCss('c-gray-avg-80'),
+ slider-size: 16px,
+ slider-bg-color: getVarCss('c-white'),
+ slider-border-radius: 50%,
+ slider-box-shadow: 0 1px 3px 0 rgba(0, 0,  0, 0.1),
+ inner-color: getVarCss('c-white'),
+ inner-font-size: getVarCss('font-size-12'),
+ checked-border-color: getVarCss('c-primary'),
+ checked-bg-color: getVarCss('c-primary'),
+ checked-inner-color: getVarCss('c-white'),
+);
+
+$variantDisabled: (
+  color: getVarCss('c-gray-avg-60'),
+  active-color: getVarCss('c-primary-disabled'),
+  border-color: getVarCss('c-gray-avg-93'),
+  bg-color: getVarCss('c-gray-avg-93'),
+  checked-border-color: getVarCss('c-primary-disabled'),
+  checked-bg-color: getVarCss('c-primary-disabled'),
+  checked-inner-color: getVarCss('c-white')
+);
+
+@include b('switch') {
+  @include set-component-css-var('switch', $switch);
+  @apply inline-flex justify-start items-center cursor-pointer select-none;
+  &__input {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+    @apply -z-10 opacity-0 outline-none appearance-none w-2 h-2;
+  }
+  &__center {
+    @apply  relative inline-flex items-center justify-center;
+    min-width: getVarCss('switch-min-width');
+    height: getVarCss('switch-height');
+    background-color: getVarCss('switch-bg-color');
+    border-color: getVarCss('switch-border-color');
+    border-radius: getVarCss('switch-border-radius');
+  }
+  &__inner {
+    @apply inline-flex items-center justify-center;
+    color: getVarCss('switch-inner-color');
+    line-height: calc(getVarCss('switch-height') - 2px);
+    font-size: getVarCss('switch-inner-font-size');
+    padding: 0 calc(getVarCss('switch-height') / 4) 0 calc(getVarCss('switch-slider-size') + getVarCss('switch-height') / 4);
+    transition: all 0.1s ease;
+  }
+  &__slider {
+    @apply absolute inline-flex items-center justify-center;
+    height: getVarCss('switch-slider-size');
+    width: getVarCss('switch-slider-size');
+    left: 4px;
+    font-size: getVarCss('switch-inner-font-size');
+    background-color: getVarCss('switch-slider-bg-color');
+    border-radius: getVarCss('switch-slider-border-radius');
+    box-shadow: getVarCss('switch-slider-box-shadow');
+    color: getVarCss('switch-slider-color');
+    transition: all 0.1s ease;
+  }
+ 
+  &__label {
+    color: getVarCss('switch-color');
+    &--active {
+      color: getVarCss('switch-active-color');
+    }
+    &--left {
+      margin-right: 4px;
+    }
+    &--right {
+      margin-left: 4px;
+    }
+  }
+  $SLCT: &;
+  &--checked {
+    #{$SLCT}__center {
+      background-color: getVarCss('switch-checked-bg-color');
+      border-color: getVarCss('switch-checked-border-color');
+    }
+    #{$SLCT}__inner {
+      padding: 0  calc(getVarCss('switch-slider-size') + getVarCss('switch-height') / 4) 0 calc(getVarCss('switch-height') / 4);
+    }
+    #{$SLCT}__slider {
+      left: calc(100% - getVarCss('switch-slider-size') - 4px);
+    }
+  }
+  &.is-disabled {
+    @include set-component-css-var('switch', $variantDisabled);
+    @apply cursor-not-allowed;
+  }
+}

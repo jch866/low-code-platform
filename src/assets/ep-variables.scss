@@ -1,0 +1,10 @@
+$ep-theme: #262AFF; // 主题色
+
+:root {
+  --ep-c-theme: #{$ep-theme};
+  --ep-c-primary: #{$ep-theme};
+  --ep-c-primary-hover: #1B1EC6;
+  --ep-c-primary-active: #1B1EC6;
+  --ep-c-primary-disabled: #AECAFF;
+  --ep-c-primary-visited: #75A6FF;
+}

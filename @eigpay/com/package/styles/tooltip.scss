@@ -1,0 +1,14 @@
+@use './variables.scss' as *;
+
+$tooltip: (
+  height: 32px
+);
+
+@include b('tooltip') {
+  // @include set-component-css-var('tooltip', $tooltip);
+  // @apply inline-flex leading-8 align-middle text-sm cursor-pointer relative;
+  // height: getVarCss('tooltip', 'height');
+  &__trigger {
+    @apply inline-block;
+  }
+}

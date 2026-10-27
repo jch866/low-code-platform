@@ -1,0 +1,50 @@
+@use './variables.scss' as *;
+// $tree
+$namespace: 'ep' !default;
+@include b(tree) {
+  position: relative;
+  cursor: default;
+  background: getCssVar('fill-color', 'blank');
+  color: getCssVar('tree-text-color');
+  font-size: getCssVar('font-size', 'base');
+
+  &__node--content {
+    display: flex;
+    align-items: center;
+    .ep-checkbox:not(:last-child) {
+      margin-right: 4px;
+    }
+  }
+}
+
+@include b(tree-node) {
+  white-space: nowrap;
+  outline: none;
+  &:focus {
+    > .#{$namespace}-tree-node__content {
+      background-color: getCssVar('tree-node-hover-bg-color');
+    }
+  }
+
+  &__expand-icon {
+    width: 24px;
+    height: 24px;
+    box-sizing: content-box;
+    transform: rotate(270deg);
+    color: #a8abb2;
+    cursor: pointer;
+    &.expanded {
+      transform: rotate(0deg);
+    }
+    &.is-leaf {
+      color: transparent;
+      cursor: default;
+    }
+  }
+}
+
+.#{$namespace}-tree--highlight-current
+  .#{$namespace}-tree-node.is-current
+  > .#{$namespace}-tree-node__content {
+  background-color: getCssVar('color-primary-light-9');
+}

@@ -1,0 +1,73 @@
+@use './variables.scss' as *;
+
+$breadcrumb: (
+  'font-size-normal': getVarCss('font-size-14'),
+  'line-height': 24px,
+  'separator-icon-margin': 0 6px,
+  'text-color-regular': getVarCss('c-gray-avg-40'),
+  'text-color-primary': getVarCss('c-text-primary'),
+  'text-color-placeholder': getVarCss('c-mix-high-3')
+);
+
+@include b('breadcrumb') {
+  @include set-component-css-var('breadcrumb', $breadcrumb);
+
+  display: flex;
+  align-items: center;
+  font-size: getVarCss('breadcrumb-font-size-normal');
+  line-height: getVarCss('breadcrumb-line-height');
+
+  &__separator {
+    margin: getVarCss('breadcrumb-separator-icon-margin');
+    color: getVarCss('breadcrumb-text-color-placeholder');
+    &.is-icon {
+      margin: getVarCss('breadcrumb-separator-icon-margin');
+      font-size: getVarCss('font-size-12');
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+
+    &:last-child {
+      .#{$ns}-breadcrumb__inner,
+      .#{$ns}-breadcrumb__inner a {
+        &,
+        &:hover {
+          color: getVarCss('breadcrumb-text-color-regular');
+          cursor: text;
+        }
+      }
+      .#{$ns}-breadcrumb__separator {
+        display: none;
+      }
+    }
+
+    &.is-highlight {
+      .#{$ns}-breadcrumb__inner {
+        color: getVarCss('c-primary');
+      }
+      .#{$ns}-breadcrumb__separator {
+        color: getVarCss('c-primary');
+        &.is-icon {
+          color: getVarCss('c-primary');
+        }
+      }
+    }
+  }
+
+  &__inner {
+    color: getVarCss('breadcrumb-text-color-regular');
+    &.is-link,
+    & a {
+      text-decoration: none;
+      color: getVarCss('breadcrumb-text-color-primary');
+
+      &:hover {
+        color: getVarCss('c-primary');
+        cursor: pointer;
+      }
+    }
+  }
+}

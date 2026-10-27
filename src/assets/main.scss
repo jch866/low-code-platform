@@ -1,0 +1,346 @@
+@use "sass:math";
+@use "./variables.scss" as *;
+@use "./base.scss";
+@use "./flowcontrol.scss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.#{$ns} { // body
+  color: var(--color-text);
+  transition: color 0.5s, background-color 0.5s;
+  line-height: 1.6;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+}
+
+#{$appId} { // app入口
+  width: 100%;
+  height: 100%;
+  .icon-svg {
+    width: 1em; height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+  }
+  // 表格操作列
+  .table-operation {
+    font-size: 14px;
+    color: var(--ep-c-theme);
+    white-space: nowrap;
+    > span {
+      height: 30px;
+      display: inline-block;
+      line-height: 2rem;
+      vertical-align: middle;
+    }
+    .button-text {
+      @apply cursor-pointer;
+      white-space: nowrap;
+    }
+    .text-button {
+      border: none;
+      padding: 0;
+      background: rgba(0, 0, 0, 0);
+    }
+    .split {
+      margin: 0 10px;
+      color: #bfcae2;
+    }
+    .ep-popover {
+      width: unit-convertor(40);
+    }
+  }
+  // 表格圆点统一样式
+  .ep-table-pl{
+    @apply ml-[15px];
+  }
+  .level-one-title { // 一级标题样式
+    @apply py-[16px];
+    @apply pl-[32px];
+    font-size: 18px;
+    font-family: MicrosoftYaHei-Bold, MicrosoftYaHei;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 1px solid #F0F3FA;
+    background: #ffffff
+  }
+  .level-two-title { // 二级标题样式
+    @apply py-[8px];
+    font-size: 14px;
+    font-family: MicrosoftYaHei-Bold, MicrosoftYaHei;
+    font-weight: bold;
+    color: #333333;
+    background: #ffffff
+  }
+  .level-two-title::before { // 二级标题前伪类
+    width: 3px;
+    height: 14px;
+    background-color: #262AFF;
+    display: inline-block;
+    border-radius: 4px;
+    margin-right: 7px;
+    content: '';
+    position: relative;
+    top: 2px;
+  }
+  .upload-prompt-text { // 上传证件提示文字
+    font-size: 12px;
+    font-family: MicrosoftYaHei;
+    color: #999999;
+    line-height: 18px;
+  }
+  .content-area { // 页面内容区域内边距 - 不是用card组件
+    @apply py-[16px];
+    @apply px-[32px];
+    background: #ffffff;
+  }
+  .button {
+    width: 49px;
+    height: 19px;
+    font-size: 14px;
+    font-family: MicrosoftYaHei;
+    color: #262AFF;
+    line-height: 19px;
+    @apply px-[8px];
+  }
+  .split {
+    color: #DCE0EC;
+  }
+  .data-to {
+    @apply px-[8px];
+  }
+  .content-area-tip {
+    @apply pb-[16px];
+  }
+  .single-row-max-width { // 输入框单行表单最大宽度限制
+    @apply max-w-[650px];
+  }
+  /**
+   * 表单一行两个元素
+   * 01 输入框 按钮
+   * 02 两个下拉框
+   * 03 两个输入框
+   * 04 输入框 文字
+   */
+  .double-input-button {
+    @apply flex;
+    @apply w-full;
+    .ep-button {
+      @apply ml-[16px]
+    }
+  }
+  .double-selects{
+    @apply flex justify-between;
+    @apply w-full;
+    .ep-select:first-child {
+      @apply mr-[10px]
+    }
+  }
+  .double-inputs{
+    @apply flex justify-between;
+    @apply w-full;
+    .ep-input:first-child {
+      @apply mr-[10px]
+    }
+  }
+  .double-input-span {
+    @apply w-full;
+    @apply flex;
+    span {
+      @apply ml-[16px];
+      @apply min-w-[40px];
+      @apply text-[14px];
+    }
+  }
+  .table-input-text {
+    @apply flex;
+    line-height: unit-convertor(30);
+    span {
+      @apply ml-[8px]
+    }
+  }
+  .details-form-style { // ep-form表单详情样式
+    .ep-form-item {
+      @apply mb-[8px];
+      .ep-form-item__label {
+        color: #999999;
+      }
+      .ep-form-item__content {
+        font-family: MicrosoftYaHei;
+        color: #333333;
+        @apply text-[14px];
+        word-break: break-all;
+      }
+    }
+  }
+  .eliminate-bottom-effects { // 消除底部组件影响
+    @apply pb-[16px];
+    position: relative;
+    height: calc(100% - 56px);
+    overflow: auto;
+  }
+  .special-style-label {
+    .ep-form-item__label {
+      line-height: unit-convertor(16);
+    }
+  }
+  // card公共样式
+  .ep-card {
+    border: none;
+    .ep-card__header {
+      border-bottom: 1px solid #f0f3fa !important;
+      .card-header-text {
+        @apply px-[16px];
+        @apply py-[4px];
+        color: #333;
+        font-weight: bold;
+        font-size: unit-convertor(18);
+      }
+    }
+    .ep-card__body {
+      .level-two-title-card {
+        @apply py-[8px];
+        font-size: 14px;
+        font-family: MicrosoftYaHei-Bold, MicrosoftYaHei;
+        font-weight: bold;
+        color: #333333;
+        background: #ffffff
+      }
+      .level-two-title-card::before { // 二级标题前伪类
+        width: 3px;
+        height: 14px;
+        background-color: #262AFF;
+        display: inline-block;
+        border-radius: 4px;
+        margin-right: 7px;
+        content: '';
+        position: relative;
+        top: 2px;
+      }
+    }
+  }
+  // card 内容区padding
+  .box-card-content {
+    .ep-card__body {
+      @apply px-[32px];
+    }
+  }
+  // card圆角
+  .card-radius {
+    border-radius: unit-convertor(4);
+  }
+  .details-down-text {
+    font-size: unit-convertor(14);
+    line-height: unit-convertor(18);
+    color: #999999;
+    span {
+      @apply ml-[8px];
+      color: #262AFF;
+    }
+  }
+  .details-tab {
+    .ep-tab-header {
+      // @apply px-[32px];
+      background: #ffffff;
+    }
+  }
+    // 锚点样式
+  .ep-anchor__wraper {
+    display: block;
+    .ep-anchor {
+      display: none;
+      position: fixed;
+      right: unit-convertor(46);
+      top: unit-convertor(232);
+      box-shadow: 0px 0px 4px 0px #EDEDED;
+      background-color: #fff;
+      padding: unit-convertor(24);
+      z-index: 4;
+    }
+  }
+  // 元素禁用样式
+  .disabled-el {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+// 附件左边距
+.attachStyle {
+  @apply ml-[30px];
+}
+
+// key: value 展示
+.grayText {
+  color: #999999;
+  span{
+    color: #333333;
+  }
+}
+
+// 下拉菜单
+.ep-popper {
+  padding: 0 !important;
+  .table-operation-item {
+    padding: 0 unit-convertor(18);
+    border-bottom: 1px solid #F0F3FA;
+    white-space: nowrap;
+    height: unit-convertor(37);
+    line-height: unit-convertor(37);
+    font-size: unit-convertor(14);
+    .text {
+      color: #666;
+    }
+    .text-button {
+      border: none;
+      padding: 0;
+    }
+  }
+  .table-operation-item:hover {
+    .text {
+      color: var(--ep-c-theme);
+    }
+  }
+  .ep_form{
+    font-size: unit-convertor(14);
+    .ep_form_item{
+      margin-bottom: 0;
+    }
+  }
+}
+
+// 日期宽度
+.ep-date-picker {
+  width: 100%;
+}
+
+
+.ep-form {
+  .ep-form-item__content {
+    font-family: MicrosoftYaHei;
+    color: #333333;
+    >span {
+      font-size: 14px;
+    }
+  }
+}
+.dialog-details-form { // ep-form表单详情样式
+  .ep-form-item {
+    @apply mb-[8px];
+    .ep-form-item__label {
+      color: #999999;
+    }
+    .ep-form-item__content {
+      font-family: MicrosoftYaHei;
+      color: #333333;
+      @apply text-[14px];
+    }
+  }
+}

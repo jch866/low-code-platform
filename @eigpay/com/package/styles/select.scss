@@ -1,0 +1,90 @@
+@use './variables.scss' as *;
+
+$select: (
+  height: 32px,
+  border-color: getVarCss('c-mix-high-2'),
+  width: 40px
+);
+
+$select-item: (
+  height: 38px,
+  font-size: 12px
+);
+
+$dropdown: (
+  border-color: getVarCss('c-mix-high-2'),
+  min-width: 120px
+);
+
+@include b('select') {
+  @include set-component-css-var('select', $select);
+  @apply w-full align-middle cursor-pointer relative;
+  // line-height: calc(getVarCss('select', 'height') - 2px);
+  &__trigger {
+    font-size: 16px;
+    line-height: 20px;
+    vertical-align: middle;
+  }
+  &__tags {
+    @apply absolute leading-normal top-1/2  whitespace-normal -translate-y-1/2  flex items-center flex-wrap cursor-pointer;
+    z-index: 1;
+    width: calc(100% - 20px);
+    .#{$ns}-tag {
+      @apply my-0.5 ml-0 mr-1;
+      &:last-child {
+        @apply mr-0;
+      }
+    }
+  }
+  &__tags-wrapper {
+    &-has-prefix {
+      @apply ml-1;
+    }
+  }
+  &__input {
+    @apply p-0 outline-0 border-0 bg-transparent;
+    height: calc(getVarCss('select', 'height') - 4px);
+    &:focus-visible { // firefox specific
+      outline: none;
+    }
+  }
+  &__dropdown {
+    @include set-component-css-var('dropdown', $dropdown);
+    @apply w-full bg-white z-10 cursor-pointer max-h-48 overflow-auto;
+    min-width: getVarCss('dropdown', 'min-width');
+    &-item {
+      @include set-component-css-var('select-item', $select-item);
+      @apply font-medium px-1.5;
+      color: getVarCss('c-gray-avg-20');
+      //height: getVarCss('select-item', 'height');
+      line-height: getVarCss('select-item', 'height');
+      font-size: getVarCss('select-item', 'font-size');
+      &.is-disabled {
+        color: getVarCss('c-text-disable');
+        cursor: not-allowed;
+      }
+      &.is-selected {
+        color: getVarCss('c-primary');
+      }
+      &.is-hover {
+        background-color: getVarCss('c-base-blue-2');
+      }
+    }
+    &--empty {
+      @apply p-3 text-xs;
+    }
+  }
+  &__dropdown-icon {
+    @apply transition-transform;
+    color: getVarCss('c-gray-avg-20-o-30');
+    &.is-expand {
+      @apply rotate-180;
+      color: getVarCss('c-gray-avg-20-o-30');
+    }
+  }
+  &__clear-icon {
+    .#{$ns}-icon {
+      font-size: getVarCss('font-size-16')
+    }
+  }
+}

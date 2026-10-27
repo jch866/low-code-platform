@@ -1,0 +1,47 @@
+@use 'variables' as *;
+
+$transfer: (
+  'label-height': 46px,
+  'sub-label-height': 42px,
+  'bg-color': getVarCss('c-primary'),
+  'hover-bg-color': #f6f7fa,
+  'active-bg-color': #f6f7fa,
+  'inside-bg-color': #005bba,
+  'text-color': getVarCss('c-white'),
+  'hover-text-color': getVarCss('c-primary'),
+  'active-text-color': getVarCss('c-primary'),
+  'disabled-text-color': getVarCss('c-gray-avg-60'),
+  'text-font-size': getVarCss('font-size-14'),
+  'text-font-weight': 600,
+  'sub-text-font-weight': 500,
+  'base-level-padding': 20px,
+  'icon-margin': 11px,
+  'icon-width': 16px,
+  'box-shadow': rgba(0, 0, 0, 0.15)
+);
+
+@include b('transfer') {
+  @include set-component-css-var('transfer', $transfer);
+}
+
+@include b('transfer-panel') {
+  &__header {
+  }
+
+  &__body {
+    &.is-with-footer {
+    }
+  }
+
+  &__filter {
+  }
+
+  &__list {
+  }
+
+  &__empty {
+  }
+
+  &__footer {
+  }
+}

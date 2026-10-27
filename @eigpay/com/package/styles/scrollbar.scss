@@ -1,0 +1,59 @@
+@use './variables.scss' as *;
+$scrollbar: (
+  thum-bg-color: getVarCss('c-shadow'),
+  thum-w-h: 6px,
+  track-offset: 2px
+);
+
+@include b(scrollbar) {
+  @include set-component-css-var('scrollbar', $scrollbar);
+  @apply relative h-full;
+  $SLCT: &; 
+  &__wrapper {
+    @apply h-full w-full;
+    overflow: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    &__view {
+      // @apply inline-block w-auto;
+    }
+  }
+  &__track {
+    @apply absolute rounded-2xl z-10;
+    &.is-vertical {
+      width: getVarCss('scrollbar', 'thum-w-h');
+      bottom: getVarCss('scrollbar', 'track-offset');
+      top: getVarCss('scrollbar', 'track-offset');
+      right: getVarCss('scrollbar', 'track-offset');
+      
+      & #{$SLCT}__thumb {
+        width: getVarCss('scrollbar', 'thum-w-h');
+      }
+
+    }
+    &.is-horizontal {
+      left: getVarCss('scrollbar', 'track-offset');
+      right: getVarCss('scrollbar', 'track-offset');
+      height: getVarCss('scrollbar', 'thum-w-h');
+      bottom: getVarCss('scrollbar', 'track-offset');
+      & #{$SLCT}__thumb {
+        height: getVarCss('scrollbar', 'thum-w-h');
+      }
+    }
+  }
+  &__thumb {
+    @apply rounded-2xl cursor-grab;
+    background-color: getVarCss('scrollbar', 'thum-bg-color');
+  }
+}
+
+@include b(scrollbar-track) {
+  &-enter-active, &-leave-active {
+    transition: opacity .2s ease ;
+  }
+  &-enter-from, &-leave-to {
+    opacity: 0;
+  }
+}
