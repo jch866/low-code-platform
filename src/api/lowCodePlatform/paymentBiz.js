@@ -134,3 +134,97 @@ export const getPaymentImportExcel = (data) => mockSimple({ resultMsg: '导入�
 
 /** 模块管理（原 PayModel.vue / ModuleInfoModal.vue，POST /product/module/add，仅新增） */
 export const getPaymentModuleAdd = (data) => mockSimple({ resultMsg: '新增成功' })
+
+/** 模块树 mock（原 queryProductModuleTreeList 返回结构：{key,title,children} + 模块实体字段） */
+const mockModuleTree = [
+  {
+    key: 'M001',
+    title: '系统管理模块',
+    moduleName: '系统管理模块',
+    moduleCode: 'MOD001',
+    moduleCategory: '1',
+    virtualTableName: 'sys_module',
+    type: '1',
+    description: '系统管理类模块',
+    parentId: '',
+    children: [
+      {
+        key: 'M001-01',
+        title: '用户管理模块',
+        moduleName: '用户管理模块',
+        moduleCode: 'MOD00101',
+        moduleCategory: '1',
+        virtualTableName: 'sys_user',
+        type: '1',
+        description: '用户信息维护模块',
+        parentId: 'M001',
+        children: []
+      }
+    ]
+  },
+  {
+    key: 'M002',
+    title: '支付业务模块',
+    moduleName: '支付业务模块',
+    moduleCode: 'MOD002',
+    moduleCategory: '2',
+    virtualTableName: 'pay_module',
+    type: '2',
+    description: '支付业务模型模块',
+    parentId: '',
+    children: [
+      {
+        key: 'M002-01',
+        title: '账务处理模块',
+        moduleName: '账务处理模块',
+        moduleCode: 'MOD00201',
+        moduleCategory: '2',
+        virtualTableName: 'pay_account',
+        type: '2',
+        description: '账务处理业务模型',
+        parentId: 'M002',
+        children: []
+      }
+    ]
+  }
+]
+
+/** 平铺模块树（搜索 mock 用） */
+const flattenModuleTree = (nodes) => {
+  const list = []
+  nodes.forEach((node) => {
+    list.push({ ...node, children: undefined })
+    if (node.children && node.children.length) list.push(...flattenModuleTree(node.children))
+  })
+  return list
+}
+
+/** 模块树（原 queryProductModuleTreeList，GET /product/module/queryModuleList） */
+export const getPaymentModuleTreeList = () => mockResponse(JSON.parse(JSON.stringify(mockModuleTree)))
+
+/** 上级模块树（原 queryProductModuleIdTree，GET /product/module/queryIdTree） */
+export const getPaymentModuleIdTree = () => mockResponse(JSON.parse(JSON.stringify(mockModuleTree)))
+
+/** 模块关键字搜索（原 searchProductModuleByKeywords({keyWord})，GET /product/module/searchBy，mock 按模块名称过滤后平铺返回） */
+export const searchProductModuleByKeywords = (data) => {
+  const keyWord = (data && data.keyWord) || ''
+  const matched = flattenModuleTree(JSON.parse(JSON.stringify(mockModuleTree))).filter((i) => (i.moduleName || '').includes(keyWord))
+  return mockResponse(matched, matched.length)
+}
+
+/** 修改模块（原 PayModel.vue submitCurrForm，PUT /product/module/edit，payload=节点原始字段+表单值） */
+export const getPaymentModuleEdit = (data) => mockSimple({ resultMsg: '操作成功' })
+
+/** 删除模块（原 deleteByProductModuleId({id})，GET /product/module/delete） */
+export const deleteByProductModuleId = (data) => mockSimple({ resultMsg: '删除成功!' })
+
+/** 批量删除模块（原 deleteAction /product/module/deleteBatch，{ids: 树勾选 checkedKeys 拼接}） */
+export const getPaymentModuleDeleteBatch = (data) => mockSimple({ resultMsg: '删除成功' })
+
+/** 模块类目字典（原 j-dict-select-tag dictCode=module_category，真实字典项走
+ *  GET /sys/dict/config/getDictItems/module_category，mock 暂以占位项代替，联调时替换） */
+export const getModuleCategoryDict = () =>
+  mockResponse([
+    { value: '1', label: '模块类目一' },
+    { value: '2', label: '模块类目二' }
+  ])

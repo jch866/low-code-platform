@@ -72,10 +72,8 @@
         <!-- 权限码: product:pay:buss:delete（原批量删除数据源=树勾选 checkedKeys，非表格选中行） -->
         <ep-button type="danger" plain @click="onBatchDelete">批量删除</ep-button>
         <ep-button plain @click="loadTree">刷新</ep-button>
-        <!-- 权限码: product:pay:buss:module:add（原 PayModel.vue 独立模块管理页） -->
-        <ep-button plain @click="onPlaceholder('原组件 ModuleInfoModal.vue（模块管理），待迁移')">
-          模块管理
-        </ep-button>
+        <!-- 权限码: product:pay:buss:module:add（原 PayModel.vue 独立模块管理页，已迁移为 ModuleInfoModal 弹窗） -->
+        <ep-button plain @click="onOpenModuleManage">模块管理</ep-button>
       </div>
 
       <!-- 交易节点列表（原页面无 a-table，此处按右侧内容承载交易节点数据） -->
@@ -162,22 +160,31 @@
             </ep-form-item>
           </ep-form>
         </ep-tab-pane>
-        <!-- 原 tab2 系统交互：大量硬编码渠道服务/接口 router-link，非可平铺内容，整体占位 -->
+        <!--
+          保存 payload 说明（对照源 submitCurrForm）：源保存交易 = Object.assign(currSelected, 表单值) 后
+          PUT /product/payment/edit，payload 仅含 tab1 基本信息表单字段 + 树节点原始字段；
+          tab2~tab6 面板（系统交互/业务流程/业务模型/智能路由/系统适配）均为展示型面板，
+          无子表数组参与保存 payload 合并（源中不存在交互配置/流程配置/模块关联子表）。
+        -->
+        <!-- 原 tab2 系统交互（LC0357）：硬编码渠道/核心/通道/下游接口链接卡片 → TransChannelPanel -->
         <ep-tab-pane name="2" label="系统交互">
-          <div class="placeholder-block">原 tab 面板（系统交互-渠道/服务/接口链接），待迁移</div>
+          <TransChannelPanel />
         </ep-tab-pane>
+        <!-- 原 tab3 业务流程（LC0358）：源 PayList.vue 未实现 tabKey==='3' 内容面板（任务预期的「流程配置子表」在源中不存在），保持空面板 -->
         <ep-tab-pane name="3" label="业务流程">
-          <div class="placeholder-block">原 tab 面板（业务流程），待迁移</div>
+          <div class="empty-tab-pane">源面板为空（PayList.vue 未实现 tabKey=3 内容）</div>
         </ep-tab-pane>
-        <!-- 原 tab4 业务模型：按 moduleTreeData 渲染链接（tableName=child.virtualTableName） -->
+        <!-- 原 tab4 业务模型（LC0345）：moduleTreeData 模块卡片（tableName=child.virtualTableName）→ TransModelPanel（tab 切换加载） -->
         <ep-tab-pane name="4" label="业务模型">
-          <div class="placeholder-block">原 tab 面板（业务模型-模块链接），待迁移</div>
+          <TransModelPanel :active="state.activeTab === '4'" />
         </ep-tab-pane>
+        <!-- 原 tab5 智能路由（LC0359）：源为空面板 -->
         <ep-tab-pane name="5" label="智能路由">
-          <div class="placeholder-block">原 tab 面板（智能路由，原为空面板），待迁移</div>
+          <div class="empty-tab-pane">源面板为空（PayList.vue 未实现 tabKey=5 内容）</div>
         </ep-tab-pane>
+        <!-- 原 tab6 系统适配（LC0360）：源为空面板 -->
         <ep-tab-pane name="6" label="系统适配">
-          <div class="placeholder-block">原 tab 面板（系统适配，原为空面板），待迁移</div>
+          <div class="empty-tab-pane">源面板为空（PayList.vue 未实现 tabKey=6 内容）</div>
         </ep-tab-pane>
       </ep-tab>
     </div>
@@ -260,13 +267,21 @@
       </template>
     </ep-dialog>
 
-    <!-- 占位弹窗（导出/导入/模块管理等复杂功能） -->
+    <!-- 占位弹窗（导出/导入等复杂功能） -->
     <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="30%">
       <div class="placeholder-block">{{ state.placeholderText }}</div>
       <template #footer>
         <ep-button plain @click="state.placeholderVisible = false">关闭</ep-button>
       </template>
     </ep-dialog>
+
+    <!--
+      模块管理弹窗（原 PayModel.vue 独立模块管理页 + payment/modules/ModuleInfoModal.vue 迁移）：
+      checkInfo 传当前选中业务节点（对照源消费方 PayModel.vue handleAdd(2) 传本页树 selectedKeys 作上级预填参数的映射，
+      此处取页面左树选中交易节点 state.currentNode，弹窗内模块树无选中时回退作「添加子模块」上级预填）；
+      @ok 按源消费方行为为刷新（原 @ok="loadTree" 刷新模块树，模块树在弹窗内自刷新，此处刷新交易列表）
+    -->
+    <ModuleInfoModal ref="moduleModalRef" :check-info="state.currentNode" @ok="onModuleManageOk" />
   </div>
 </template>
 
@@ -285,10 +300,17 @@ import {
   getPaymentDeleteBatch
 } from '@/api/lowCodePlatform/paymentBiz'
 import TreeSelect from '@/components/treeSelect/TreeSelect.vue'
+// 模块管理弹窗（原 PayModel.vue / payment/modules/ModuleInfoModal.vue 迁移）
+import ModuleInfoModal from './modules/moduleInfoModal.vue'
+// 系统交互面板（原 PayList.vue tab key=2 硬编码渠道/核心/通道/下游接口链接卡片）
+import TransChannelPanel from './modules/transChannelPanel.vue'
+// 业务模型面板（原 PayList.vue tab key=4 moduleTreeData 模块卡片，tab 切换加载）
+import TransModelPanel from './modules/transModelPanel.vue'
 
 const treeRef = ref(null)
 const addFormRef = ref(null)
 const editFormRef = ref(null)
+const moduleModalRef = ref(null)
 
 const addForm = {
   transName: '',
@@ -553,10 +575,22 @@ const handleDelete = debounce(async () => {
   }
 })
 
-/** 占位弹窗（导出/导入/模块管理等） */
+/** 占位弹窗（导出/导入等） */
 const onPlaceholder = (text) => {
   state.placeholderText = text
   state.placeholderVisible = true
+}
+
+/** 模块管理入口（原独立页 PayModel.vue → 迁移为 ModuleInfoModal 弹窗）：
+ *  对照源消费方打开时机/传参——原 PayModel 内 handleAdd(2) 打开 ModuleInfoModal.add(selectedKeys) 传本页树选中 key，
+ *  此处入口按钮打开弹窗并通过 check-info 传当前选中业务节点（state.currentNode），映射关系见组件 props 注释 */
+const onOpenModuleManage = () => {
+  moduleModalRef.value?.showModal()
+}
+
+/** 模块保存回调（原消费方 @ok="loadTree" 刷新模块树，模块树在弹窗内已自刷新；此处按接线要求刷新交易列表） */
+const onModuleManageOk = () => {
+  loadTransList()
 }
 
 // 页面加载时
@@ -633,6 +667,15 @@ onMounted(() => {
   padding: 40px 16px;
   color: #999;
   background: #f7f9fd;
+}
+/* 源空面板占位（tab3 业务流程 / tab5 智能路由 / tab6 系统适配：源 PayList.vue 无对应内容面板） */
+.empty-tab-pane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  color: #bbb;
+  background: #fbfcfe;
 }
 .button-text {
   padding: 0;

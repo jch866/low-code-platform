@@ -10,14 +10,12 @@
         class="dataset-card"
       >
         <div class="dataset-head">
-          <!-- 与源差异：原 a-popover 内嵌 ItemBtn（j-select-regulator 校验 validatorRegulator/格式化 formatorRegulator 选择器）为深层选择器，以只读输入框占位 -->
-          <ep-input
-            :model-value="
-              (item.validatorRegulator || '') + (item.formatorRegulator || '')
-            "
-            readonly
+          <!-- 已迁移 ItemBtn（源 a-popover 内嵌，改为内联两行选择器）：校验 validatorRegulator / 格式化 formatorRegulator -->
+          <ItemBtn
+            v-if="item.fieldType !== 'TABLE'"
+            v-model:regulatorValidateProps="item.validatorRegulator"
+            v-model:regulatorFormatProps="item.formatorRegulator"
             :disabled="disabled"
-            placeholder="选择器待迁移：ItemBtn（validatorRegulator/formatorRegulator）"
             class="item-btn-input"
           />
           <span class="index-tag">{{ index }}</span>
@@ -68,14 +66,12 @@
         class="dataset-card"
       >
         <div class="dataset-head">
-          <!-- 与源差异：原 a-popover 内嵌 ItemBtn 同源数据区块，以只读输入框占位 -->
-          <ep-input
-            :model-value="
-              (item.validatorRegulator || '') + (item.formatorRegulator || '')
-            "
-            readonly
+          <!-- 已迁移 ItemBtn（源 a-popover 内嵌，改为内联两行选择器）：同源数据区块 -->
+          <ItemBtn
+            v-if="item.fieldType !== 'TABLE'"
+            v-model:regulatorValidateProps="item.validatorRegulator"
+            v-model:regulatorFormatProps="item.formatorRegulator"
             :disabled="disabled"
-            placeholder="选择器待迁移：ItemBtn（validatorRegulator/formatorRegulator）"
             class="item-btn-input"
           />
           <span class="index-tag">{{ index }}</span>
@@ -150,14 +146,11 @@
             placeholder="请输入文本内容信息"
             type="text"
           />
-          <!-- DICT：原 DictData（j-select-dict 数据字典选择器）深层选择器占位 -->
-          <ep-input
+          <!-- 已迁移 DictData（j-select-dict 数据字典选择器）：fetchType/dictType/dictValue 写回 defaultValue -->
+          <DictData
             v-else
-            :model-value="paramBrief(item.defaultValue)"
-            readonly
+            v-model:dictDataParamProps="item.defaultValue"
             :disabled="disabled"
-            placeholder="选择器待迁移：DictData（fetchType/dictType/dictValue，j-select-dict）"
-            type="text"
           />
         </div>
       </div>
@@ -167,6 +160,8 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import ItemBtn from '@/components/itemBtn/ItemBtn.vue'
+import DictData from '@/components/dictData/DictData.vue'
 import {
   REGULATOR_FIELD_TYPE_OPTIONS,
   EXT_PARAM_TYPE_OPTIONS,

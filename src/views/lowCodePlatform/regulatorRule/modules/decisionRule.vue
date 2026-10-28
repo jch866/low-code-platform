@@ -60,13 +60,12 @@
                 :value="opt.value"
               />
             </ep-select>
-            <!-- 与源差异：原 ItemBtn（校验/格式化选择器）以只读输入框占位 -->
-            <ep-input
-              :model-value="(item.leftData.validatorRegulator || '') + (item.leftData.formatorRegulator || '')"
-              readonly
+            <!-- 已迁移 ItemBtn（源 a-popover 内嵌，改为内联两行选择器）：校验 validatorRegulator / 格式化 formatorRegulator -->
+            <ItemBtn
+              v-if="regulatorChilds[index].leftData.fieldType !== 'TABLE'"
+              v-model:regulatorValidateProps="item.leftData.validatorRegulator"
+              v-model:regulatorFormatProps="item.leftData.formatorRegulator"
               :disabled="disabled"
-              placeholder="选择器待迁移：ItemBtn（validatorRegulator/formatorRegulator）"
-              type="text"
             />
             <!-- FIXED：原 FixedData 内联（绑定 params.value） -->
             <ep-input
@@ -101,13 +100,12 @@
                 :value="opt.value"
               />
             </ep-select>
-            <!-- 与源差异：原 JSelectRegulator（JSelectBizComponent 规则选择器）深层选择器，以只读输入框占位 -->
-            <ep-input
-              :model-value="regulatorChilds[index].operatorRegulator || ''"
-              readonly
+            <!-- 已迁移 JSelectRegulator（JSelectBizComponent 规则选择器，返回 regulatorId）：判断规则选择，写回 operatorRegulator -->
+            <JSelectRegulator
+              v-model="regulatorChilds[index].operatorRegulator"
+              :multiple="false"
               :disabled="disabled"
-              placeholder="选择器待迁移：JSelectRegulator（字段 operatorRegulator）"
-              type="text"
+              placeholder="判断规则"
             />
           </div>
 
@@ -126,13 +124,12 @@
                 :value="opt.value"
               />
             </ep-select>
-            <!-- 与源差异：原 ItemBtn 同左值，以只读输入框占位 -->
-            <ep-input
-              :model-value="(item.rightData.validatorRegulator || '') + (item.rightData.formatorRegulator || '')"
-              readonly
+            <!-- 已迁移 ItemBtn（源 a-popover 内嵌，改为内联两行选择器）：同左值 -->
+            <ItemBtn
+              v-if="regulatorChilds[index].rightData.fieldType !== 'TABLE'"
+              v-model:regulatorValidateProps="item.rightData.validatorRegulator"
+              v-model:regulatorFormatProps="item.rightData.formatorRegulator"
               :disabled="disabled"
-              placeholder="选择器待迁移：ItemBtn（validatorRegulator/formatorRegulator）"
-              type="text"
             />
             <ep-input
               v-if="regulatorChilds[index].rightData.fieldType === 'FIXED'"
@@ -166,6 +163,8 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import ItemBtn from '@/components/itemBtn/ItemBtn.vue'
+import JSelectRegulator from '@/components/jSelectRegulator/JSelectRegulator.vue'
 import {
   REGULATOR_FIELD_TYPE_OPTIONS,
   RULE_CONDITION_OPTIONS,

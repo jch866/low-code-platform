@@ -131,3 +131,67 @@ export const queryFlowPage = (data = {}) => {
 
 /** 树节点平铺导出（JSelectServiceModal 回显 dataList） */
 export const flattenServiceTree = flattenTreeNodes
+
+/**
+ * 字典选择器 API（DictData 数据字典数据源，对应 Vue2 源组件 JSelectDict / JDictSelectTag）
+ * 真实接口地址（联调时替换 mock，字符串与 Vue2 工程 src/api/api.js 一致）：
+ * - 字典列表:  GET /sys/dict/config/list                    （JSelectDict listUrl，JeecgListMixin 分页）
+ * - 字典项:    GET /sys/dict/getDictItems/{dictCode}        （JDictSelectTag ajaxGetDictItems，返回 [{value,text}]）
+ * 说明（与源差异）：真实接口为 res.success + res.result.records / res.result.total，
+ * 此处统一用 mockResponse（returnCode/result/totalCount）与本项目既有 mock 约定保持一致。
+ */
+
+/** 字典配置列表 mock（字段与原 /sys/dict/config/list 一致：id/dictCode/dictName/description） */
+const mockDictConfigList = [
+  { id: 'DC001', dictCode: 'error_code', dictName: '错误码', description: '业务处理错误码' },
+  { id: 'DC002', dictCode: 'regulator_field_type', dictName: '数据集字段类型', description: '规则数据集类型' },
+  { id: 'DC003', dictCode: 'rule_conditions', dictName: '规则运算符', description: '合并规则条件' },
+  { id: 'DC004', dictCode: 'dict_fetch_type', dictName: '字典取值方式', description: '字典数据取值方式' },
+  { id: 'DC005', dictCode: 'yes_no', dictName: '是否', description: '通用是否字典' },
+  { id: 'DC006', dictCode: 'currency_type', dictName: '币种类型', description: '支付币种' }
+]
+
+/** 字典项 mock（key=dictCode，value 为 [{value,text}]，与 ajaxGetDictItems 返回结构一致） */
+const mockDictItemsMap = {
+  error_code: [
+    { value: 'E0001', text: '账户不存在' },
+    { value: 'E0002', text: '余额不足' },
+    { value: 'E0003', text: '交易超限' }
+  ],
+  regulator_field_type: [
+    { value: 'FIXED', text: '固定数据' },
+    { value: 'MSG', text: '报文数据' },
+    { value: 'DICT', text: '数据字典' }
+  ],
+  rule_conditions: [
+    { value: '==', text: '等于' },
+    { value: '!=', text: '不等于' },
+    { value: '>', text: '大于' },
+    { value: '<', text: '小于' }
+  ],
+  yes_no: [
+    { value: 'Y', text: '是' },
+    { value: 'N', text: '否' }
+  ],
+  currency_type: [
+    { value: 'CNY', text: '人民币' },
+    { value: 'USD', text: '美元' },
+    { value: 'HKD', text: '港币' }
+  ]
+}
+
+/**
+ * 字典配置分页列表（原 GET /sys/dict/config/list，JSelectDict 选择字典数据源）
+ * 查询参数：dictCode（字典编码，模糊）/ dictName（字典名称，模糊）+ pageNo/pageSize 分页
+ */
+export const queryDictConfigPage = (data = {}) => {
+  const { pageNo = 1, pageSize = 10, dictCode, dictName } = data
+  let filtered = [...mockDictConfigList]
+  if (dictCode) filtered = filtered.filter((i) => i.dictCode.includes(dictCode))
+  if (dictName) filtered = filtered.filter((i) => i.dictName.includes(dictName))
+  const start = (pageNo - 1) * pageSize
+  return mockResponse(filtered.slice(start, start + pageSize), filtered.length)
+}
+
+/** 字典项列表（原 GET /sys/dict/getDictItems/{dictCode}，JDictSelectTag 按 dictType 加载数据字典值下拉） */
+export const getDictItems = (dictCode) => mockResponse(mockDictItemsMap[dictCode] || [])

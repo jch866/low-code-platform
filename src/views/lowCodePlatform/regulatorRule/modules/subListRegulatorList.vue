@@ -53,14 +53,14 @@
 
           <!-- 中列：SUB=子节点处理器选择 / CHILD=类处理器 + 处理器参数 + 错误码描述 -->
           <div class="col-mid">
-            <!-- childType=SUB：子节点处理器（与源差异：原 JSelectRegulator 规则选择器，深层选择器以只读输入框占位） -->
+            <!-- childType=SUB：子节点处理器（已迁移 JSelectRegulator 规则选择器，返回 regulatorId；LC0827 请选择子节点处理器；
+                 注意源字段名 regulatorName 实际存 regulatorId，语义照搬） -->
             <div v-if="item.childType === 'SUB'">
-              <ep-input
-                :model-value="item.regulatorName || ''"
-                readonly
+              <JSelectRegulator
+                v-model="item.regulatorName"
+                :multiple="false"
                 :disabled="disabled"
-                placeholder="选择器待迁移：JSelectRegulator（字段 regulatorName）"
-                type="text"
+                placeholder="请选择子节点处理器"
               />
             </div>
 
@@ -100,14 +100,11 @@
                   placeholder="请输入文本内容信息"
                   type="text"
                 />
-                <!-- DICT：原 DictData（j-select-dict 数据字典选择器）深层选择器占位 -->
-                <ep-input
+                <!-- 已迁移 DictData（j-select-dict 数据字典选择器）：fetchType/dictType/dictValue 写回 defaultValue -->
+                <DictData
                   v-else
-                  :model-value="paramBrief(items.defaultValue)"
-                  readonly
+                  v-model:dictDataParamProps="items.defaultValue"
                   :disabled="disabled"
-                  placeholder="选择器待迁移：DictData（fetchType/dictType/dictValue，j-select-dict）"
-                  type="text"
                 />
               </div>
 
@@ -215,6 +212,8 @@
 <script setup>
 import { ref, watch } from 'vue'
 import JSelectRegulatorInfo from '@/components/jSelectRegulatorInfo/JSelectRegulatorInfo.vue'
+import JSelectRegulator from '@/components/jSelectRegulator/JSelectRegulator.vue'
+import DictData from '@/components/dictData/DictData.vue'
 import { EPMessageTips } from '@/utils/utils'
 import { getRuleInfoByClassName } from '@/api/lowCodePlatform/regulatorRule'
 import {

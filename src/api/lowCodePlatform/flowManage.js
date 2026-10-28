@@ -100,3 +100,27 @@ export const getFlowListColumns = (data) =>
  */
 export const getFlowDuplicateCheck = (data) =>
   mockSimple({ success: true, result: true })
+
+/**
+ * 关联流程树（/related/process/queryAssociatedProcess，参数 {pkValue}）
+ * 已迁移 ParentProcess.vue「查看关联流程」用：返回树形对象 {name, children:[...]}（原 echarts 树图数据源），
+ * mock 返回三层示例树（节点名称与列表页 mock 流程对应），联调后替换为真实 Axios 调用
+ */
+export const getAssociatedProcess = (data) =>
+  mockSimple({
+    success: true,
+    result: {
+      name: '消费交易流程(FLOW_CONSUME)',
+      children: [
+        {
+          name: '开始节点',
+          children: [
+            { name: '风险校验(黑名单检查规则)', children: [] },
+            { name: '金额校验(金额超限规则)', children: [] }
+          ]
+        },
+        { name: '扣款节点', children: [{ name: '退款子流程(FLOW_REFUND)', children: [] }] },
+        { name: '结束节点', children: [] }
+      ]
+    }
+  })

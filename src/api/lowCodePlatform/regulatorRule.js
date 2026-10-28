@@ -16,7 +16,7 @@ import { mockResponse, mockSimple } from './common'
  * - 交互引用:  /related/process/queryAssociatedSwapCorrelationRules（参数 {pkValue}）
  */
 
-// mock 行数据：字段名与原后端一致（regulatorId=规则标识，regulatorName=规则名称）
+// mock 行数据：字段名与原后端一致（regulatorId=规则标识，regulatorName=规则名称；createTime 供 JSelectRegulator 选择器按 createTime 排序分页）
 const mockList = [
   {
     id: '1',
@@ -29,6 +29,7 @@ const mockList = [
     asCommon: false,
     transCode: '',
     className: 'AmountValidator',
+    createTime: '2026-09-01 10:00:00',
     createTime_dateText: '2026-09-01 10:00:00',
     updateTime_dateText: '2026-09-15 10:00:00'
   },
@@ -43,6 +44,7 @@ const mockList = [
     asCommon: true,
     transCode: '',
     className: '',
+    createTime: '2026-09-15 14:30:00',
     createTime_dateText: '2026-09-15 14:30:00',
     updateTime_dateText: '2026-09-20 09:00:00'
   },
@@ -57,16 +59,36 @@ const mockList = [
     asCommon: false,
     transCode: '',
     className: '',
+    createTime: '2026-10-01 08:20:00',
     createTime_dateText: '2026-10-01 08:20:00',
     updateTime_dateText: '2026-10-12 16:45:00'
   }
 ]
 
-/** 列表（/configuation/regulatorrule/config/listPage） */
-export const getRegulatorRuleList = (data) => {
-  const { pageNo = 1, pageSize = 10 } = data
+/**
+ * 列表（/configuation/regulatorrule/config/listPage）
+ * 供规则列表页与 JSelectRegulator 选择器弹窗共用；查询参数（原 JeecgListMixin）：
+ * - regulatorId（规则标识，选择器回显按此反查，支持逗号分隔多值）/ regulatorName（规则名称，模糊）
+ * - systemName / regulatorSubType（原字典过滤）+ column/order（排序）+ pageNo/pageSize（分页）
+ */
+export const getRegulatorRuleList = (data = {}) => {
+  const { pageNo = 1, pageSize = 10, column = 'createTime', order = 'desc', regulatorId, regulatorName, systemName, regulatorSubType } = data
+  let filtered = [...mockList]
+  if (regulatorId) {
+    // 选择器回显按 regulatorId 反查（与源 valueKey=regulatorId 拼接值对应，逗号分隔多值逐一匹配）
+    const ids = String(regulatorId).split(',')
+    filtered = filtered.filter((i) => ids.includes(i.regulatorId))
+  }
+  if (regulatorName) filtered = filtered.filter((i) => i.regulatorName.includes(regulatorName))
+  if (systemName) filtered = filtered.filter((i) => i.systemName === systemName)
+  if (regulatorSubType) filtered = filtered.filter((i) => i.regulatorSubType === regulatorSubType)
+  if (column === 'createTime') {
+    filtered.sort((a, b) =>
+      order === 'asc' ? a.createTime.localeCompare(b.createTime) : b.createTime.localeCompare(a.createTime)
+    )
+  }
   const start = (pageNo - 1) * pageSize
-  return mockResponse(mockList.slice(start, start + pageSize), mockList.length)
+  return mockResponse(filtered.slice(start, start + pageSize), filtered.length)
 }
 
 /** 新增（POST /configuation/regulatorrule/config/add） */
@@ -116,3 +138,37 @@ export const getAssociatedFlowRules = (data) => mockSimple({ success: true, resu
 
 /** 交互引用（/related/process/queryAssociatedSwapCorrelationRules，参数 {pkValue}；mock 返回空列表） */
 export const getAssociatedSwapRules = (data) => mockSimple({ success: true, result: [] })
+
+/**
+ * 规则处理器关联引用（/related/process/queryAssociatedRuleProcessor，参数 {pkValue}）
+ * 已迁移 ParentProcessRuleInfoList.vue「查看关联引用」用：返回 {code, name, children:[{name}]}，
+ * children 为引用该规则处理器的流程/规则名称列表（弹窗内搜索 + 分页展示，每页 15 条）；
+ * mock 返回 17 条示例引用，联调后替换为真实 Axios 调用
+ */
+export const getAssociatedRuleProcessor = (data) =>
+  mockSimple({
+    success: true,
+    result: {
+      code: 'RULE_AMOUNT_LIMIT',
+      name: '金额超限规则',
+      children: [
+        { name: '消费交易流程(FLOW_CONSUME)' },
+        { name: '信用卡还款流程(FLOW_CREDIT_REPAY)' },
+        { name: '退款流程(FLOW_REFUND)' },
+        { name: '转账流程(FLOW_TRANSFER)' },
+        { name: '对账流程(FLOW_RECONCILE)' },
+        { name: '清分流程(FLOW_CLEARING)' },
+        { name: '出款流程(FLOW_PAYOUT)' },
+        { name: '入款流程(FLOW_PAYIN)' },
+        { name: '充值流程(FLOW_RECHARGE)' },
+        { name: '提现流程(FLOW_WITHDRAW)' },
+        { name: '冲正流程(FLOW_REVERSE)' },
+        { name: '分账流程(FLOW_SPLIT)' },
+        { name: '代付流程(FLOW_AGENT_PAYOUT)' },
+        { name: '代收流程(FLOW_AGENT_PAYIN)' },
+        { name: '结算流程(FLOW_SETTLE)' },
+        { name: '风控审核流程(FLOW_RISK_AUDIT)' },
+        { name: '退款审核流程(FLOW_REFUND_AUDIT)' }
+      ]
+    }
+  })

@@ -39,14 +39,14 @@
             />
           </ep-select>
           <span class="index-tag">{{ index }}</span>
-          <!-- 与源差异：原 JSelectRegulator（JSelectBizComponent 规则选择器）为深层选择器，以只读输入框占位 -->
-          <ep-input
-            :model-value="item.regulatorName || ''"
-            readonly
+          <!-- 已迁移 JSelectRegulator（JSelectBizComponent 规则选择器，返回 regulatorId）：LC0827 请选择子节点处理器；
+               注意源字段名 regulatorName 实际存 regulatorId，语义照搬 -->
+          <JSelectRegulator
+            v-model="item.regulatorName"
+            :multiple="false"
             :disabled="disabled"
-            placeholder="选择器待迁移：JSelectRegulator（字段 regulatorName）"
+            placeholder="请选择子节点处理器"
             class="rule-input"
-            type="text"
           />
           <div class="card-actions">
             <ep-button plain type="primary" class="button-text" :disabled="disabled" @click="handleChildUp(index)">上移</ep-button>
@@ -62,6 +62,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import JSelectRegulator from '@/components/jSelectRegulator/JSelectRegulator.vue'
 import { sortByKey } from './ruleConstants'
 
 const props = defineProps({

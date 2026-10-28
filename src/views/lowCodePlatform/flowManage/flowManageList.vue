@@ -248,15 +248,9 @@
       </template>
     </ep-dialog>
 
-    <!-- 待迁移功能 占位弹窗（查看关联流程；导出SQL/数据比对已迁移，历史记录已改为真实跳转） -->
-    <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="480px">
-      <div class="placeholder-body">{{ state.placeholderText }}</div>
-      <template #footer>
-        <span>
-          <ep-button plain @click="state.placeholderVisible = false">关闭</ep-button>
-        </span>
-      </template>
-    </ep-dialog>
+    <!-- 已迁移：ParentProcess 查看关联流程（原 handProcess → toPkValue=row.id + vuex parentProcessData=true
+         控制显隐，去 vuex 化改为 ref.edit(row) 打开，组件内 ep-dialog v-model 管理显隐） -->
+    <ParentProcess ref="parentProcessRef" />
 
     <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(row) 打开） -->
     <DevelopProjectEnviSelectModal ref="enviSelectRef" />
@@ -332,10 +326,6 @@
   border-top: 1px solid #f0f3fa;
   text-align: right;
 }
-.placeholder-body {
-  color: #999;
-  padding: 12px 0;
-}
 </style>
 
 <script setup>
@@ -360,12 +350,16 @@ import JSelectFlow from '@/components/jSelectFlow/JSelectFlow.vue'
 // 已迁移组件：SubmitFooterWithReq 提交底栏（开发需求码） / DevelopProjectEnviSelectModal 比对数据环境选择
 import SubmitFooterWithReq from '@/components/submitFooterWithReq/SubmitFooterWithReq.vue'
 import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
+// 已迁移：ParentProcess 查看关联流程（原 ../../develop/modules/BranchSubmit/parentProcess.vue）
+import ParentProcess from '@/components/parentProcess/ParentProcess.vue'
 import downFile, { formatDate } from '@/utils/downFile'
 
 const formRef = ref(null)
 // SubmitFooterWithReq（读取 requireCode 作为 developRequire 提交参数）与比对环境选择弹窗
 const reqSelectRef = ref(null)
 const enviSelectRef = ref(null)
+// 查看关联流程弹窗（ParentProcess，ref.edit(row) 打开）
+const parentProcessRef = ref(null)
 const router = useRouter()
 
 // TODO: 联调后接入表字典 local|develop_system,system_name,system_code（所属系统下拉/单选，联调前保持为空）
@@ -513,10 +507,7 @@ const state = reactive({
   flowDesignVisible: false,
   flowViewOnly: false,
   currentFlow: null,
-  currentFlowData: null,
-  // 占位弹窗
-  placeholderVisible: false,
-  placeholderText: ''
+  currentFlowData: null
 })
 
 /** 获取列表数据 */
@@ -680,10 +671,10 @@ const onEnviSelect = (row) => {
   enviSelectRef.value?.edit(row)
 }
 
-/** 查看关联流程（原 handProcess → vuex parentProcessData=true 显示 ParentProcess 组件 toPkValue，待迁移） */
+/** 查看关联流程（已迁移 ParentProcess：原 handProcess → toPkValue=val.id + vuex parentProcessData=true 显示，
+ * 去 vuex 化改为 ref.edit(row)，显隐由组件内 ep-dialog v-model 管理） */
 const onProcess = (row) => {
-  state.placeholderVisible = true
-  state.placeholderText = '原组件 ParentProcess（查看关联流程面板，toPkValue=' + row.id + '，由 vuex parentProcessData 控制显隐），待迁移'
+  parentProcessRef.value?.edit(row)
 }
 
 /** 打开流程设计器（可编辑；原 onFlowDesign：flowDesignVisible=true、viewOnly=false、selectedFlowDetail=record） */

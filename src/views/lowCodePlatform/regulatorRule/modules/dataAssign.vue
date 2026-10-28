@@ -52,13 +52,12 @@
                 :value="opt.value"
               />
             </ep-select>
-            <!-- 与源差异：原 ItemBtn（j-select-regulator 校验 validatorRegulator/格式化 formatorRegulator 选择器）以只读输入框占位 -->
-            <ep-input
-              :model-value="(item.leftData.validatorRegulator || '') + (item.leftData.formatorRegulator || '')"
-              readonly
+            <!-- 已迁移 ItemBtn（源 a-popover 内嵌，改为内联两行选择器）：校验 validatorRegulator / 格式化 formatorRegulator -->
+            <ItemBtn
+              v-if="regulatorChilds[index].leftData.fieldType !== 'TABLE'"
+              v-model:regulatorValidateProps="item.leftData.validatorRegulator"
+              v-model:regulatorFormatProps="item.leftData.formatorRegulator"
               :disabled="disabled"
-              placeholder="选择器待迁移：ItemBtn（validatorRegulator/formatorRegulator）"
-              type="text"
             />
             <!-- FIXED：原 FixedData 内联（绑定 params.value） -->
             <ep-input
@@ -93,13 +92,12 @@
                 :value="opt.value"
               />
             </ep-select>
-            <!-- 与源差异：原 ItemBtn 同左值，以只读输入框占位 -->
-            <ep-input
-              :model-value="(item.rightData.validatorRegulator || '') + (item.rightData.formatorRegulator || '')"
-              readonly
+            <!-- 已迁移 ItemBtn（源 a-popover 内嵌，改为内联两行选择器）：同左值 -->
+            <ItemBtn
+              v-if="regulatorChilds[index].rightData.fieldType !== 'TABLE'"
+              v-model:regulatorValidateProps="item.rightData.validatorRegulator"
+              v-model:regulatorFormatProps="item.rightData.formatorRegulator"
               :disabled="disabled"
-              placeholder="选择器待迁移：ItemBtn（validatorRegulator/formatorRegulator）"
-              type="text"
             />
             <!-- FIXED：原 FixedData 内联 -->
             <ep-input
@@ -126,6 +124,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import ItemBtn from '@/components/itemBtn/ItemBtn.vue'
 import {
   REGULATOR_FIELD_TYPE_OPTIONS,
   selectorPlaceholder,

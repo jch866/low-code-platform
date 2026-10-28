@@ -37,9 +37,10 @@ export const EXT_PARAM_TYPE_OPTIONS = [
 ]
 
 /**
- * 各字段类型对应的深层选择器占位说明（原组件名 + 主要绑定字段名）
- * 与源差异：MsgData/TransData/CTXData/RedisData/RefMsgData/OutMsgData/DictData/TableData/DynamicModelData
- * 等数据集/字段选择器不在本次迁移范围，以只读输入框 + 选择器待迁移 占位
+ * 各字段类型对应的数据集选择器说明（原组件名 + 主要绑定字段名）
+ * 与源差异：MsgData/TransData/CTXData/RedisData/RefMsgData/OutMsgData/TableData/DynamicModelData
+ * 等数据集/字段选择器尚未迁移，以只读输入框 + 选择器待接入 提示占位；
+ * DictData 已迁移（src/components/dictData/DictData.vue，处理参数 defaultValue 场景），数据集字段级 DICT 仍占位
  */
 export const SELECTOR_PLACEHOLDER_MAP = {
   MSG: 'MsgData（logicalName，字典 logical_fields_xpath）',
@@ -53,9 +54,9 @@ export const SELECTOR_PLACEHOLDER_MAP = {
   DYNAMIC: 'DynamicModelData（j-select-dynamic-model）'
 }
 
-/** 生成占位文案：选择器待迁移：原组件名（字段） */
+/** 生成占位文案：选择器待接入：原组件名（字段） */
 export const selectorPlaceholder = (fieldType) =>
-  '选择器待迁移：' + (SELECTOR_PLACEHOLDER_MAP[fieldType] || '数据集/字段选择器')
+  '选择器待接入：' + (SELECTOR_PLACEHOLDER_MAP[fieldType] || '数据集/字段选择器')
 
 /** 生成行 id（源使用 flow 设计器 ZFSN.getId()，子应用不引入 flow 依赖，改为时间戳+随机串，与源差异） */
 export const nextRowId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`

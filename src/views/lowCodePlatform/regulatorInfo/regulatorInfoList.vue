@@ -213,15 +213,9 @@
       </template>
     </ep-dialog>
 
-    <!-- 待迁移功能 占位弹窗（查看关联引用；数据比对已迁移 DevelopProjectEnviSelectModal，历史记录已改为真实跳转） -->
-    <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="480px">
-      <div class="placeholder-body">{{ state.placeholderText }}</div>
-      <template #footer>
-        <span>
-          <ep-button plain @click="state.placeholderVisible = false">关闭</ep-button>
-        </span>
-      </template>
-    </ep-dialog>
+    <!-- 已迁移：ParentProcessRuleInfoList 查看关联引用（原 handRegulatorProcess → regulatorInfoPkValue=row.id +
+         vuex parentProcessData=true 控制显隐，去 vuex 化改为 ref.edit(row) 打开，组件内 ep-dialog v-model 管理显隐） -->
+    <ParentProcessRuleInfoList ref="parentProcessRef" />
 
     <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(row) 打开） -->
     <DevelopProjectEnviSelectModal ref="enviSelectRef" />
@@ -248,12 +242,16 @@ import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
 import JCodeEditor from '@/components/jCodeEditor/JCodeEditor.vue'
 import SubmitFooterWithReq from '@/components/submitFooterWithReq/SubmitFooterWithReq.vue'
 import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
+// 已迁移：ParentProcessRuleInfoList 查看关联引用（原 ../../develop/modules/BranchSubmit/parentProcessRuleInfoList.vue）
+import ParentProcessRuleInfoList from '@/components/parentProcess/ParentProcessRuleInfoList.vue'
 import downFile from '@/utils/downFile'
 
 const formRef = ref(null)
 // SubmitFooterWithReq（读取 requireCode 作为 developRequire 提交参数）与比对环境选择弹窗
 const reqSelectRef = ref(null)
 const enviSelectRef = ref(null)
+// 查看关联引用弹窗（ParentProcessRuleInfoList，ref.edit(row) 打开）
+const parentProcessRef = ref(null)
 const router = useRouter()
 
 // TODO: 联调后接入表字典 local|develop_system,system_name,system_code（所属系统下拉，联调前保持为空）
@@ -391,10 +389,7 @@ const state = reactive({
   regulatorInfoParams: [],
   // 删除
   dialogVisibleDel: false,
-  deleteIds: [],
-  // 占位弹窗
-  placeholderVisible: false,
-  placeholderText: ''
+  deleteIds: []
 })
 
 /** 获取列表数据 */
@@ -591,10 +586,10 @@ const onEnviSelect = (row) => {
   enviSelectRef.value?.edit(row)
 }
 
-/** 查看关联引用（原 handRegulatorProcess → vuex parentProcessData=true 显示 ParentProcessRuleInfoList，待迁移） */
+/** 查看关联引用（已迁移 ParentProcessRuleInfoList：原 handRegulatorProcess → regulatorInfoPkValue=val.id + vuex
+ * parentProcessData=true 显示，去 vuex 化改为 ref.edit(row)，显隐由组件内 ep-dialog v-model 管理） */
 const onRegulatorProcess = (row) => {
-  state.placeholderVisible = true
-  state.placeholderText = '原组件 ParentProcessRuleInfoList（查看关联引用面板，toPkValue=' + row.id + '，由 vuex parentProcessData 控制显隐），待迁移'
+  parentProcessRef.value?.edit(row)
 }
 
 /* 分页器相关操作 */
@@ -653,9 +648,5 @@ onMounted(() => {
 .param-empty {
   color: #999;
   margin-bottom: 8px;
-}
-.placeholder-body {
-  color: #999;
-  padding: 12px 0;
 }
 </style>

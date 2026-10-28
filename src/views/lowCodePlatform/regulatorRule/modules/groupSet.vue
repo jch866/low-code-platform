@@ -36,13 +36,12 @@
       </ep-table-column>
       <ep-table-column label="分组规则" min-width="300" align="center">
         <template #default="{ row }">
-          <!-- 与源差异：原 JSelectRegulator（JSelectBizComponent 规则选择器）为深层选择器，以只读输入框占位 -->
-          <ep-input
-            :model-value="row.groupIdentifyRegulator || ''"
-            readonly
+          <!-- 已迁移 JSelectRegulator（JSelectBizComponent 规则选择器，返回 regulatorId）：LC0843 请选择子执行规则，写回 groupIdentifyRegulator -->
+          <JSelectRegulator
+            v-model="row.groupIdentifyRegulator"
+            :multiple="false"
             :disabled="disabled"
-            placeholder="选择器待迁移：JSelectRegulator（字段 groupIdentifyRegulator）"
-            type="text"
+            placeholder="请选择子执行规则"
           />
         </template>
       </ep-table-column>
@@ -58,6 +57,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import JSelectRegulator from '@/components/jSelectRegulator/JSelectRegulator.vue'
 import { nextRowId } from './ruleConstants'
 
 const props = defineProps({
