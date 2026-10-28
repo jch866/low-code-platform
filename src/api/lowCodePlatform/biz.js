@@ -1,4 +1,5 @@
 import { mockResponse } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 选择器组件 API mock（对应 Vue2 源组件 JSelectService / JSelectRegulatorInfo / JSelectFlow）
@@ -98,16 +99,26 @@ const pageQuery = (list, data) => {
 }
 
 /** 业务模块树（原 GET /product/payment/queryTransList，JSelectService 弹窗树数据源） */
-export const queryTransTreeList = () => mockResponse(JSON.parse(JSON.stringify(mockServiceTree)))
+const mockQueryTransTreeListImpl = () => mockResponse(JSON.parse(JSON.stringify(mockServiceTree)))
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/payment/queryTransList */
+const META_queryTransTreeList = { operationType: '', url: '/product/payment/queryTransList', method: 'GET' }
+export function queryTransTreeList() {
+  return gatewayOrMock(META_queryTransTreeList, mockQueryTransTreeListImpl)
+}
 
 /** 当前用户有权限的部门树（原 GET /sys/sysDepart/queryChildTreeList，JSelectService userOwn=true 时调用） */
-export const queryChildDepartTreeList = () => mockResponse(JSON.parse(JSON.stringify(mockChildDepartTree)))
+const mockQueryChildDepartTreeListImpl = () => mockResponse(JSON.parse(JSON.stringify(mockChildDepartTree)))
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/sysDepart/queryChildTreeList */
+const META_queryChildDepartTreeList = { operationType: '', url: '/sys/sysDepart/queryChildTreeList', method: 'GET' }
+export function queryChildDepartTreeList() {
+  return gatewayOrMock(META_queryChildDepartTreeList, mockQueryChildDepartTreeListImpl)
+}
 
 /**
  * 规则处理器分页列表（原 GET /configuation/regulatorinfo/dynamic/listPage）
  * 查询参数：className（处理器类名，模糊）/ systemName（所属应用，字典 develop_system）/ scriptType（处理器类型，字典 regulator_script_type）
  */
-export const queryRegulatorInfoPage = (data = {}) => {
+const mockQueryRegulatorInfoPageImpl = (data = {}) => {
   const { className, systemName, scriptType } = data
   let filtered = [...mockRegulatorInfoList]
   if (className) filtered = filtered.filter((i) => i.className.includes(className))
@@ -115,12 +126,17 @@ export const queryRegulatorInfoPage = (data = {}) => {
   if (scriptType) filtered = filtered.filter((i) => i.scriptType === scriptType)
   return pageQuery(filtered, data)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorinfo/dynamic/listPage */
+const META_queryRegulatorInfoPage = { operationType: '', url: '/configuation/regulatorinfo/dynamic/listPage', method: 'GET' }
+export function queryRegulatorInfoPage(data = {}) {
+  return gatewayOrMock(META_queryRegulatorInfoPage, mockQueryRegulatorInfoPageImpl, data)
+}
 
 /**
  * 流程分页列表（原 GET /flow/manage/config/listPage）
  * 查询参数：epfFlowCode（流程编码，模糊）/ epfFlowName（流程名称，模糊）/ systemName（所属系统，字典 develop_system）
  */
-export const queryFlowPage = (data = {}) => {
+const mockQueryFlowPageImpl = (data = {}) => {
   const { epfFlowCode, epfFlowName, systemName } = data
   let filtered = [...mockFlowList]
   if (epfFlowCode) filtered = filtered.filter((i) => i.epfFlowCode.includes(epfFlowCode))
@@ -128,8 +144,13 @@ export const queryFlowPage = (data = {}) => {
   if (systemName) filtered = filtered.filter((i) => i.epfSystemId === systemName)
   return pageQuery(filtered, data)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /flow/manage/config/listPage */
+const META_queryFlowPage = { operationType: '', url: '/flow/manage/config/listPage', method: 'GET' }
+export function queryFlowPage(data = {}) {
+  return gatewayOrMock(META_queryFlowPage, mockQueryFlowPageImpl, data)
+}
 
-/** 树节点平铺导出（JSelectServiceModal 回显 dataList） */
+/** 树节点平铺导出（JSelectServiceModal 回显 dataList，纯数据工具非接口调用，页面同步消费，保持原样） */
 export const flattenServiceTree = flattenTreeNodes
 
 /**
@@ -184,7 +205,7 @@ const mockDictItemsMap = {
  * 字典配置分页列表（原 GET /sys/dict/config/list，JSelectDict 选择字典数据源）
  * 查询参数：dictCode（字典编码，模糊）/ dictName（字典名称，模糊）+ pageNo/pageSize 分页
  */
-export const queryDictConfigPage = (data = {}) => {
+const mockQueryDictConfigPageImpl = (data = {}) => {
   const { pageNo = 1, pageSize = 10, dictCode, dictName } = data
   let filtered = [...mockDictConfigList]
   if (dictCode) filtered = filtered.filter((i) => i.dictCode.includes(dictCode))
@@ -192,6 +213,16 @@ export const queryDictConfigPage = (data = {}) => {
   const start = (pageNo - 1) * pageSize
   return mockResponse(filtered.slice(start, start + pageSize), filtered.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/dict/config/list */
+const META_queryDictConfigPage = { operationType: '', url: '/sys/dict/config/list', method: 'GET' }
+export function queryDictConfigPage(data = {}) {
+  return gatewayOrMock(META_queryDictConfigPage, mockQueryDictConfigPageImpl, data)
+}
 
 /** 字典项列表（原 GET /sys/dict/getDictItems/{dictCode}，JDictSelectTag 按 dictType 加载数据字典值下拉） */
-export const getDictItems = (dictCode) => mockResponse(mockDictItemsMap[dictCode] || [])
+const mockGetDictItemsImpl = (dictCode) => mockResponse(mockDictItemsMap[dictCode] || [])
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/dict/getDictItems/{dictCode} */
+const META_getDictItems = { operationType: '', url: '/sys/dict/getDictItems/{dictCode}', method: 'GET' }
+export function getDictItems(dictCode) {
+  return gatewayOrMock(META_getDictItems, mockGetDictItemsImpl, dictCode)
+}

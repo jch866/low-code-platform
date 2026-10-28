@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 规则处理器 API（原页面 RegulatorInfoList.vue + RegulatorInfoModal.vue）
@@ -65,27 +66,62 @@ const mockList = [
 ]
 
 /** 列表（POST /configuation/regulatorinfo/config/list） */
-export const getRegulatorInfoList = (data) => {
+const mockGetRegulatorInfoListImpl = (data) => {
   const { pageNo = 1, pageSize = 10 } = data
   const start = (pageNo - 1) * pageSize
   return mockResponse(mockList.slice(start, start + pageSize), mockList.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /configuation/regulatorinfo/config/list */
+const META_getRegulatorInfoList = { operationType: '', url: '/configuation/regulatorinfo/config/list', method: 'POST' }
+export function getRegulatorInfoList(data) {
+  return gatewayOrMock(META_getRegulatorInfoList, mockGetRegulatorInfoListImpl, data)
+}
 
 /** 新增（POST /configuation/regulatorinfo/config/add） */
-export const getRegulatorInfoAdd = (data) => mockSimple({ success: true, message: '新增成功' })
+const mockGetRegulatorInfoAddImpl = (data) => mockSimple({ success: true, message: '新增成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /configuation/regulatorinfo/config/add */
+const META_getRegulatorInfoAdd = { operationType: '', url: '/configuation/regulatorinfo/config/add', method: 'POST' }
+export function getRegulatorInfoAdd(data) {
+  return gatewayOrMock(META_getRegulatorInfoAdd, mockGetRegulatorInfoAddImpl, data)
+}
 
 /** 编辑（PUT /configuation/regulatorinfo/config/edit） */
-export const getRegulatorInfoEdit = (data) => mockSimple({ success: true, message: '修改成功' })
+const mockGetRegulatorInfoEditImpl = (data) => mockSimple({ success: true, message: '修改成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /configuation/regulatorinfo/config/edit */
+const META_getRegulatorInfoEdit = { operationType: '', url: '/configuation/regulatorinfo/config/edit', method: 'PUT' }
+export function getRegulatorInfoEdit(data) {
+  return gatewayOrMock(META_getRegulatorInfoEdit, mockGetRegulatorInfoEditImpl, data)
+}
 
 /** 删除（/configuation/regulatorinfo/config/delete） */
-export const getRegulatorInfoDelete = (data) => mockSimple({ success: true, message: '删除成功' })
+const mockGetRegulatorInfoDeleteImpl = (data) => mockSimple({ success: true, message: '删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorinfo/config/delete */
+const META_getRegulatorInfoDelete = { operationType: '', url: '/configuation/regulatorinfo/config/delete', method: 'GET' }
+export function getRegulatorInfoDelete(data) {
+  return gatewayOrMock(META_getRegulatorInfoDelete, mockGetRegulatorInfoDeleteImpl, data)
+}
 
 /** 批量删除（/configuation/regulatorinfo/config/deleteBatch，参数 {ids}） */
-export const getRegulatorInfoDeleteBatch = (data) => mockSimple({ success: true, message: '批量删除成功' })
+const mockGetRegulatorInfoDeleteBatchImpl = (data) => mockSimple({ success: true, message: '批量删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorinfo/config/deleteBatch */
+const META_getRegulatorInfoDeleteBatch = { operationType: '', url: '/configuation/regulatorinfo/config/deleteBatch', method: 'GET' }
+export function getRegulatorInfoDeleteBatch(data) {
+  return gatewayOrMock(META_getRegulatorInfoDeleteBatch, mockGetRegulatorInfoDeleteBatchImpl, data)
+}
 
 /** 导出Sql（/configuation/regulatorinfo/config/exportBatchSql，原走 downFile 下载文件，此处仅 mock 占位） */
-export const getRegulatorInfoExportBatchSql = (data) => mockSimple({ success: true, message: '导出成功' })
+const mockGetRegulatorInfoExportBatchSqlImpl = (data) => mockSimple({ success: true, message: '导出成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorinfo/config/exportBatchSql（原走 downFile） */
+const META_getRegulatorInfoExportBatchSql = { operationType: '', url: '/configuation/regulatorinfo/config/exportBatchSql', method: 'GET' }
+export function getRegulatorInfoExportBatchSql(data) {
+  return gatewayOrMock(META_getRegulatorInfoExportBatchSql, mockGetRegulatorInfoExportBatchSqlImpl, data)
+}
 
 /** 动态列表单字段（/dynamic/table/column/listColumns，tableName=regulatorInfo；mock 返回空列，联调后取 allColumnsItems） */
-export const getRegulatorInfoListColumns = (data) =>
+const mockGetRegulatorInfoListColumnsImpl = (data) =>
   mockSimple({ success: true, result: { allColumnsItems: [] } })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/column/listColumns */
+const META_getRegulatorInfoListColumns = { operationType: '', url: '/dynamic/table/column/listColumns', method: 'GET' }
+export function getRegulatorInfoListColumns(data) {
+  return gatewayOrMock(META_getRegulatorInfoListColumns, mockGetRegulatorInfoListColumnsImpl, data)
+}

@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 动态表管理 API（对应 Vue2 源页面 DynamicTableList.vue + DynamicTableModal.vue 及其两个可编辑子表）
@@ -54,7 +55,7 @@ const mockList = [
 ]
 
 /** 动态表列表 */
-export const getDynamicTableList = (data) => {
+const mockGetDynamicTableListImpl = (data) => {
   const { pageNo = 1, pageSize = 10, tableName, systemName } = data
   let filtered = [...mockList]
   if (tableName) filtered = filtered.filter((i) => i.tableName.includes(tableName))
@@ -62,33 +63,68 @@ export const getDynamicTableList = (data) => {
   const start = (pageNo - 1) * pageSize
   return mockResponse(filtered.slice(start, start + pageSize), filtered.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/list */
+const META_getDynamicTableList = { operationType: '', url: '/dynamic/table/list', method: 'GET' }
+export function getDynamicTableList(data) {
+  return gatewayOrMock(META_getDynamicTableList, mockGetDynamicTableListImpl, data)
+}
 
 /** 新增动态表（原 POST /dynamic/table/add，payload {virtualTable, virtualTableColumnVO, virtualTableIndexDefineVO}） */
-export const getDynamicTableAdd = (data) => mockSimple({ resultMsg: '新增成功' })
+const mockGetDynamicTableAddImpl = (data) => mockSimple({ resultMsg: '新增成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /dynamic/table/add */
+const META_getDynamicTableAdd = { operationType: '', url: '/dynamic/table/add', method: 'POST' }
+export function getDynamicTableAdd(data) {
+  return gatewayOrMock(META_getDynamicTableAdd, mockGetDynamicTableAddImpl, data)
+}
 
 /** 编辑动态表（原 PUT /dynamic/table/edit） */
-export const getDynamicTableEdit = (data) => mockSimple({ resultMsg: '编辑成功' })
+const mockGetDynamicTableEditImpl = (data) => mockSimple({ resultMsg: '编辑成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /dynamic/table/edit */
+const META_getDynamicTableEdit = { operationType: '', url: '/dynamic/table/edit', method: 'PUT' }
+export function getDynamicTableEdit(data) {
+  return gatewayOrMock(META_getDynamicTableEdit, mockGetDynamicTableEditImpl, data)
+}
 
 /** 删除（原声明 /dynamic/table/delete，页面行内未直接使用） */
-export const getDynamicTableDelete = (data) => mockSimple({ resultMsg: '删除成功' })
+const mockGetDynamicTableDeleteImpl = (data) => mockSimple({ resultMsg: '删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/delete */
+const META_getDynamicTableDelete = { operationType: '', url: '/dynamic/table/delete', method: 'GET' }
+export function getDynamicTableDelete(data) {
+  return gatewayOrMock(META_getDynamicTableDelete, mockGetDynamicTableDeleteImpl, data)
+}
 
 /**
  * 批量删除（原 /dynamic/table/deleteBatch）
  * @param {Object} data {ids, flag} flag=true 确认删除（含关联数据）/ false 仅删除模型
  */
-export const getDynamicTableDeleteBatch = (data) => mockSimple({ resultMsg: '删除成功' })
+const mockGetDynamicTableDeleteBatchImpl = (data) => mockSimple({ resultMsg: '删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/deleteBatch */
+const META_getDynamicTableDeleteBatch = { operationType: '', url: '/dynamic/table/deleteBatch', method: 'GET' }
+export function getDynamicTableDeleteBatch(data) {
+  return gatewayOrMock(META_getDynamicTableDeleteBatch, mockGetDynamicTableDeleteBatchImpl, data)
+}
 
 /** 批量导出 SQL（原 /dynamic/table/exportBatchSql，sqlType 'DDL' 导出DDL / 默认 'DML' 导出Sql） */
-export const getDynamicTableExportBatchSql = (data) => mockSimple({ resultMsg: '导出成功' })
+const mockGetDynamicTableExportBatchSqlImpl = (data) => mockSimple({ resultMsg: '导出成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/exportBatchSql（原走 downFile） */
+const META_getDynamicTableExportBatchSql = { operationType: '', url: '/dynamic/table/exportBatchSql', method: 'GET' }
+export function getDynamicTableExportBatchSql(data) {
+  return gatewayOrMock(META_getDynamicTableExportBatchSql, mockGetDynamicTableExportBatchSqlImpl, data)
+}
 
 /** 表名查重（原 GET dynamic/table/data/isTableNameExist?tableName=，重复则清空并 warning） */
-export const getDynamicTableIsTableNameExist = (data) => {
+const mockGetDynamicTableIsTableNameExistImpl = (data) => {
   const exists = mockList.some((i) => i.tableName === data.tableName)
   return mockSimple({ result: exists })
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET dynamic/table/data/isTableNameExist（原注释无前导斜杠） */
+const META_getDynamicTableIsTableNameExist = { operationType: '', url: 'dynamic/table/data/isTableNameExist', method: 'GET' }
+export function getDynamicTableIsTableNameExist(data) {
+  return gatewayOrMock(META_getDynamicTableIsTableNameExist, mockGetDynamicTableIsTableNameExistImpl, data)
+}
 
 /** 动态表字段列表（原子表 DynamicTableColumns，GET /dynamic/table/column/listAll，参数 tableName） */
-export const getDynamicTableColumnListAll = (data) => {
+const mockGetDynamicTableColumnListAllImpl = (data) => {
   const mockColumns = [
     {
       id: 'C001',
@@ -127,12 +163,22 @@ export const getDynamicTableColumnListAll = (data) => {
   ]
   return mockResponse(mockColumns, mockColumns.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/column/listAll */
+const META_getDynamicTableColumnListAll = { operationType: '', url: '/dynamic/table/column/listAll', method: 'GET' }
+export function getDynamicTableColumnListAll(data) {
+  return gatewayOrMock(META_getDynamicTableColumnListAll, mockGetDynamicTableColumnListAllImpl, data)
+}
 
 /** 动态表索引列表（原子表 DynamicTableIndex，GET /dynamic/table/index/define/listAll） */
-export const getDynamicTableIndexListAll = (data) => {
+const mockGetDynamicTableIndexListAllImpl = (data) => {
   const mockIndex = [
     { id: 'I001', indexType: 'NORMAL-INDEX', indexColumns: 'trans_id' },
     { id: 'I002', indexType: 'FILE-NAME-INDEX', indexColumns: 'trans_date' }
   ]
   return mockResponse(mockIndex, mockIndex.length)
+}
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/index/define/listAll */
+const META_getDynamicTableIndexListAll = { operationType: '', url: '/dynamic/table/index/define/listAll', method: 'GET' }
+export function getDynamicTableIndexListAll(data) {
+  return gatewayOrMock(META_getDynamicTableIndexListAll, mockGetDynamicTableIndexListAllImpl, data)
 }

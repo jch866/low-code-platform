@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 流程节点管理 API（原页面 FlowNodeList.vue + FlowNodeModal.vue）
@@ -81,34 +82,74 @@ const mockList = [
 ]
 
 /** 列表（/flownode/manage/config/listPage；原 getQueryParams 额外传 systemName=epfSystemId） */
-export const getFlowNodeList = (data) => {
+const mockGetFlowNodeListImpl = (data) => {
   const { pageNo = 1, pageSize = 10 } = data
   const start = (pageNo - 1) * pageSize
   return mockResponse(mockList.slice(start, start + pageSize), mockList.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /flownode/manage/config/listPage */
+const META_getFlowNodeList = { operationType: '', url: '/flownode/manage/config/listPage', method: 'GET' }
+export function getFlowNodeList(data) {
+  return gatewayOrMock(META_getFlowNodeList, mockGetFlowNodeListImpl, data)
+}
 
 /** 新增（POST /flownode/manage/config/add） */
-export const getFlowNodeAdd = (data) => mockSimple({ success: true, message: '新增成功' })
+const mockGetFlowNodeAddImpl = (data) => mockSimple({ success: true, message: '新增成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /flownode/manage/config/add */
+const META_getFlowNodeAdd = { operationType: '', url: '/flownode/manage/config/add', method: 'POST' }
+export function getFlowNodeAdd(data) {
+  return gatewayOrMock(META_getFlowNodeAdd, mockGetFlowNodeAddImpl, data)
+}
 
 /** 编辑（PUT /flownode/manage/config/edit） */
-export const getFlowNodeEdit = (data) => mockSimple({ success: true, message: '修改成功' })
+const mockGetFlowNodeEditImpl = (data) => mockSimple({ success: true, message: '修改成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /flownode/manage/config/edit */
+const META_getFlowNodeEdit = { operationType: '', url: '/flownode/manage/config/edit', method: 'PUT' }
+export function getFlowNodeEdit(data) {
+  return gatewayOrMock(META_getFlowNodeEdit, mockGetFlowNodeEditImpl, data)
+}
 
 /** 删除（/flownode/manage/config/delete，参数 {id}） */
-export const getFlowNodeDelete = (data) => mockSimple({ success: true, message: '删除成功' })
+const mockGetFlowNodeDeleteImpl = (data) => mockSimple({ success: true, message: '删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /flownode/manage/config/delete */
+const META_getFlowNodeDelete = { operationType: '', url: '/flownode/manage/config/delete', method: 'GET' }
+export function getFlowNodeDelete(data) {
+  return gatewayOrMock(META_getFlowNodeDelete, mockGetFlowNodeDeleteImpl, data)
+}
 
 /** 导出SQL（/flownode/manage/config/exportBatchSql，原走 downFile 下载文件，此处仅 mock 占位） */
-export const getFlowNodeExportBatchSql = (data) => mockSimple({ success: true, message: '导出成功' })
+const mockGetFlowNodeExportBatchSqlImpl = (data) => mockSimple({ success: true, message: '导出成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /flownode/manage/config/exportBatchSql（原走 downFile） */
+const META_getFlowNodeExportBatchSql = { operationType: '', url: '/flownode/manage/config/exportBatchSql', method: 'GET' }
+export function getFlowNodeExportBatchSql(data) {
+  return gatewayOrMock(META_getFlowNodeExportBatchSql, mockGetFlowNodeExportBatchSqlImpl, data)
+}
 
 /** 动态列表单字段（/dynamic/table/column/listColumns，tableName=epfFlowNode） */
-export const getFlowNodeListColumns = (data) =>
+const mockGetFlowNodeListColumnsImpl = (data) =>
   mockSimple({ success: true, result: { allColumnsItems: [] } })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/column/listColumns */
+const META_getFlowNodeListColumns = { operationType: '', url: '/dynamic/table/column/listColumns', method: 'GET' }
+export function getFlowNodeListColumns(data) {
+  return gatewayOrMock(META_getFlowNodeListColumns, mockGetFlowNodeListColumnsImpl, data)
+}
 
 /**
  * 唯一性校验（/sys/duplicate/check，参数 {tableName, fieldName, fieldVal}）
  * TODO: 联调后接真实校验，重复时提示 "{字段名}已存在!"
  */
-export const getFlowNodeDuplicateCheck = (data) =>
+const mockGetFlowNodeDuplicateCheckImpl = (data) =>
   mockSimple({ success: true, result: true })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/duplicate/check */
+const META_getFlowNodeDuplicateCheck = { operationType: '', url: '/sys/duplicate/check', method: 'GET' }
+export function getFlowNodeDuplicateCheck(data) {
+  return gatewayOrMock(META_getFlowNodeDuplicateCheck, mockGetFlowNodeDuplicateCheckImpl, data)
+}
 
 /** 节点引用（/related/process/queryAssociatedProcessNodes，参数 {pkValue}；mock 返回空列表，无假数据） */
-export const getAssociatedProcessNodes = (data) => mockSimple({ success: true, result: [] })
+const mockGetAssociatedProcessNodesImpl = (data) => mockSimple({ success: true, result: [] })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /related/process/queryAssociatedProcessNodes */
+const META_getAssociatedProcessNodes = { operationType: '', url: '/related/process/queryAssociatedProcessNodes', method: 'GET' }
+export function getAssociatedProcessNodes(data) {
+  return gatewayOrMock(META_getAssociatedProcessNodes, mockGetAssociatedProcessNodesImpl, data)
+}

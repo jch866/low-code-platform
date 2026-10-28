@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 历史数据查看 API（对应 Vue2 源页面 DynamicTableDataHistoryList.vue）
@@ -93,7 +94,7 @@ const mockTableColumns = [
 const mockColumnsItems = [{ columnName: 'trans_id', columnComments: '交易流水号' }]
 
 /** 历史数据列表（原 GET /dynamic/table/data/history/listObject，参数 tableName/systemName/pkValue + 分页） */
-export const getDynamicHistoryList = (data) => {
+const mockGetDynamicHistoryListImpl = (data) => {
   const { pageNo = 1, pageSize = 10, tableName, systemName, pkValue } = data
   let filtered = [...mockHistoryList]
   // mock 过滤：pkValue（原跳转传入 id）为主键过滤；systemName 非空时按行内 systemName 过滤；
@@ -103,9 +104,14 @@ export const getDynamicHistoryList = (data) => {
   const start = (pageNo - 1) * pageSize
   return mockResponse(filtered.slice(start, start + pageSize), filtered.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/data/history/listObject */
+const META_getDynamicHistoryList = { operationType: '', url: '/dynamic/table/data/history/listObject', method: 'GET' }
+export function getDynamicHistoryList(data) {
+  return gatewayOrMock(META_getDynamicHistoryList, mockGetDynamicHistoryListImpl, data)
+}
 
 /** 历史列表动态列（原 GET /dynamic/table/column/listColumns，返回体含 allColumnsItems/tableColumns/columnsItems 三个键） */
-export const getDynamicHistoryListColumns = (data) =>
+const mockGetDynamicHistoryListColumnsImpl = (data) =>
   mockSimple({
     result: {
       allColumnsItems: mockAllColumnsItems,
@@ -113,3 +119,8 @@ export const getDynamicHistoryListColumns = (data) =>
       columnsItems: mockColumnsItems
     }
   })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/column/listColumns */
+const META_getDynamicHistoryListColumns = { operationType: '', url: '/dynamic/table/column/listColumns', method: 'GET' }
+export function getDynamicHistoryListColumns(data) {
+  return gatewayOrMock(META_getDynamicHistoryListColumns, mockGetDynamicHistoryListColumnsImpl, data)
+}

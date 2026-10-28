@@ -29,6 +29,9 @@ service.interceptors.response.use(
   }
 )
 
+// 网关调用方（api/lowCodePlatform/gateway.js）复用同一实例（X-Access-Token 拦截器），仅补 export 不改逻辑
+export { service }
+
 /** GET 请求 */
 export function getAction(url, params) {
   return service.get(url, { params })

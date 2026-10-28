@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 应用管理 API（对应 Vue2 源页面 src/views/modules/product/applicationMng/index.vue + add.vue）
@@ -98,7 +99,7 @@ const mockSceneList = {
 }
 
 /** 获取应用列表（原列表接口无前导斜杠，tableName 固定 applicationSystem，由页面强制追加） */
-export const getApplicationSystemList = (data) => {
+const mockGetApplicationSystemListImpl = (data) => {
   const {
     pageNo = 1,
     pageSize = 10,
@@ -119,21 +120,46 @@ export const getApplicationSystemList = (data) => {
   const start = (pageNo - 1) * pageSize
   return mockResponse(filtered.slice(start, start + pageSize), filtered.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET dynamic/table/data/listObject（原注释无前导斜杠） */
+const META_getApplicationSystemList = { operationType: '', url: 'dynamic/table/data/listObject', method: 'GET' }
+export function getApplicationSystemList(data) {
+  return gatewayOrMock(META_getApplicationSystemList, mockGetApplicationSystemListImpl, data)
+}
 
 /** 新增应用（原接口 POST /application/config/add，body: {systemName, dataValueObject}） */
-export const getApplicationSystemAdd = (data) =>
+const mockGetApplicationSystemAddImpl = (data) =>
   mockSimple({ resultMsg: '新增成功', result: { id: String(Date.now()), ...data } })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /application/config/add */
+const META_getApplicationSystemAdd = { operationType: '', url: '/application/config/add', method: 'POST' }
+export function getApplicationSystemAdd(data) {
+  return gatewayOrMock(META_getApplicationSystemAdd, mockGetApplicationSystemAddImpl, data)
+}
 
 /** 编辑应用（原接口 PUT /application/config/edit，body 同新增） */
-export const getApplicationSystemEdit = (data) => mockSimple({ resultMsg: '编辑成功' })
+const mockGetApplicationSystemEditImpl = (data) => mockSimple({ resultMsg: '编辑成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /application/config/edit */
+const META_getApplicationSystemEdit = { operationType: '', url: '/application/config/edit', method: 'PUT' }
+export function getApplicationSystemEdit(data) {
+  return gatewayOrMock(META_getApplicationSystemEdit, mockGetApplicationSystemEditImpl, data)
+}
 
 /** 删除应用（原接口 dynamic/table/data/delete，参数 {id}） */
-export const getApplicationSystemDelete = (data) => mockSimple({ resultMsg: '删除成功' })
+const mockGetApplicationSystemDeleteImpl = (data) => mockSimple({ resultMsg: '删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET dynamic/table/data/delete（原注释无前导斜杠） */
+const META_getApplicationSystemDelete = { operationType: '', url: 'dynamic/table/data/delete', method: 'GET' }
+export function getApplicationSystemDelete(data) {
+  return gatewayOrMock(META_getApplicationSystemDelete, mockGetApplicationSystemDeleteImpl, data)
+}
 
 /** 场景列表（原接口 GET /application/config/detail?ids={sceneIds}，编辑回显用） */
-export const getApplicationSystemDetail = (data) => {
+const mockGetApplicationSystemDetailImpl = (data) => {
   const sceneList = mockSceneList[data.ids] || []
   return mockSimple({ result: sceneList })
+}
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /application/config/detail */
+const META_getApplicationSystemDetail = { operationType: '', url: '/application/config/detail', method: 'GET' }
+export function getApplicationSystemDetail(data) {
+  return gatewayOrMock(META_getApplicationSystemDetail, mockGetApplicationSystemDetailImpl, data)
 }
 
 /* ==================== 业务节点流程设计（原 applicationAdd.vue 三接口） ==================== */
@@ -144,11 +170,16 @@ const mockBusinessNodes = [
   { code: 'BN002', name: '风控检查节点', nodeType: 'service' },
   { code: 'BN003', name: '账务处理节点', nodeType: 'service' }
 ]
-export const getBusinessNodeListFroType = () =>
+const mockGetBusinessNodeListFroTypeImpl = () =>
   mockResponse(mockBusinessNodes, mockBusinessNodes.length)
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /business/node/listFroType */
+const META_getBusinessNodeListFroType = { operationType: '', url: '/business/node/listFroType', method: 'GET' }
+export function getBusinessNodeListFroType() {
+  return gatewayOrMock(META_getBusinessNodeListFroType, mockGetBusinessNodeListFroTypeImpl)
+}
 
 // 流程数据（原 ajaxGetFlowData：GET /flow/manage/config/getFlowData/{flowId} → res.result 即 flowDataInfo）
-export const getApplicationFlowData = (data) => {
+const mockGetApplicationFlowDataImpl = (data) => {
   const flowId = data?.flowId || ''
   return mockSimple({
     result: {
@@ -165,6 +196,16 @@ export const getApplicationFlowData = (data) => {
     }
   })
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /flow/manage/config/getFlowData/{flowId} */
+const META_getApplicationFlowData = { operationType: '', url: '/flow/manage/config/getFlowData/{flowId}', method: 'GET' }
+export function getApplicationFlowData(data) {
+  return gatewayOrMock(META_getApplicationFlowData, mockGetApplicationFlowDataImpl, data)
+}
 
 // 流程保存（原 POST /flow/design/config/save，payload = 设计器 JSON + epfFlowId）
-export const saveFlowDesign = (data) => mockSimple({ resultMsg: '保存成功' })
+const mockSaveFlowDesignImpl = (data) => mockSimple({ resultMsg: '保存成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /flow/design/config/save */
+const META_saveFlowDesign = { operationType: '', url: '/flow/design/config/save', method: 'POST' }
+export function saveFlowDesign(data) {
+  return gatewayOrMock(META_saveFlowDesign, mockSaveFlowDesignImpl, data)
+}

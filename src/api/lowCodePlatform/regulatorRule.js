@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 业务规则 API（原页面 RegulatorRuleList.vue + RegulatorRuleModal.vue）
@@ -71,7 +72,7 @@ const mockList = [
  * - regulatorId（规则标识，选择器回显按此反查，支持逗号分隔多值）/ regulatorName（规则名称，模糊）
  * - systemName / regulatorSubType（原字典过滤）+ column/order（排序）+ pageNo/pageSize（分页）
  */
-export const getRegulatorRuleList = (data = {}) => {
+const mockGetRegulatorRuleListImpl = (data = {}) => {
   const { pageNo = 1, pageSize = 10, column = 'createTime', order = 'desc', regulatorId, regulatorName, systemName, regulatorSubType } = data
   let filtered = [...mockList]
   if (regulatorId) {
@@ -90,32 +91,67 @@ export const getRegulatorRuleList = (data = {}) => {
   const start = (pageNo - 1) * pageSize
   return mockResponse(filtered.slice(start, start + pageSize), filtered.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorrule/config/listPage */
+const META_getRegulatorRuleList = { operationType: '', url: '/configuation/regulatorrule/config/listPage', method: 'GET' }
+export function getRegulatorRuleList(data = {}) {
+  return gatewayOrMock(META_getRegulatorRuleList, mockGetRegulatorRuleListImpl, data)
+}
 
 /** 新增（POST /configuation/regulatorrule/config/add） */
-export const getRegulatorRuleAdd = (data) => mockSimple({ success: true, message: '新增成功' })
+const mockGetRegulatorRuleAddImpl = (data) => mockSimple({ success: true, message: '新增成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /configuation/regulatorrule/config/add */
+const META_getRegulatorRuleAdd = { operationType: '', url: '/configuation/regulatorrule/config/add', method: 'POST' }
+export function getRegulatorRuleAdd(data) {
+  return gatewayOrMock(META_getRegulatorRuleAdd, mockGetRegulatorRuleAddImpl, data)
+}
 
 /** 编辑（PUT /configuation/regulatorrule/config/edit） */
-export const getRegulatorRuleEdit = (data) => mockSimple({ success: true, message: '修改成功' })
+const mockGetRegulatorRuleEditImpl = (data) => mockSimple({ success: true, message: '修改成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /configuation/regulatorrule/config/edit */
+const META_getRegulatorRuleEdit = { operationType: '', url: '/configuation/regulatorrule/config/edit', method: 'PUT' }
+export function getRegulatorRuleEdit(data) {
+  return gatewayOrMock(META_getRegulatorRuleEdit, mockGetRegulatorRuleEditImpl, data)
+}
 
 /** 删除（/configuation/regulatorrule/config/delete） */
-export const getRegulatorRuleDelete = (data) => mockSimple({ success: true, message: '删除成功' })
+const mockGetRegulatorRuleDeleteImpl = (data) => mockSimple({ success: true, message: '删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorrule/config/delete */
+const META_getRegulatorRuleDelete = { operationType: '', url: '/configuation/regulatorrule/config/delete', method: 'GET' }
+export function getRegulatorRuleDelete(data) {
+  return gatewayOrMock(META_getRegulatorRuleDelete, mockGetRegulatorRuleDeleteImpl, data)
+}
 
 /** 批量删除（/configuation/regulatorrule/config/deleteBatch，参数 {ids}） */
-export const getRegulatorRuleDeleteBatch = (data) => mockSimple({ success: true, message: '批量删除成功' })
+const mockGetRegulatorRuleDeleteBatchImpl = (data) => mockSimple({ success: true, message: '批量删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorrule/config/deleteBatch */
+const META_getRegulatorRuleDeleteBatch = { operationType: '', url: '/configuation/regulatorrule/config/deleteBatch', method: 'GET' }
+export function getRegulatorRuleDeleteBatch(data) {
+  return gatewayOrMock(META_getRegulatorRuleDeleteBatch, mockGetRegulatorRuleDeleteBatchImpl, data)
+}
 
 /** 导出Sql（/configuation/regulatorrule/config/exportBatchSql，原走 downFile 下载文件，此处仅 mock 占位） */
-export const getRegulatorRuleExportBatchSql = (data) => mockSimple({ success: true, message: '导出成功' })
+const mockGetRegulatorRuleExportBatchSqlImpl = (data) => mockSimple({ success: true, message: '导出成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorrule/config/exportBatchSql（原走 downFile） */
+const META_getRegulatorRuleExportBatchSql = { operationType: '', url: '/configuation/regulatorrule/config/exportBatchSql', method: 'GET' }
+export function getRegulatorRuleExportBatchSql(data) {
+  return gatewayOrMock(META_getRegulatorRuleExportBatchSql, mockGetRegulatorRuleExportBatchSqlImpl, data)
+}
 
 /** 动态列表单字段（/dynamic/table/column/listColumns，tableName=regulatorRule） */
-export const getRegulatorRuleListColumns = (data) =>
+const mockGetRegulatorRuleListColumnsImpl = (data) =>
   mockSimple({ success: true, result: { allColumnsItems: [] } })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/column/listColumns */
+const META_getRegulatorRuleListColumns = { operationType: '', url: '/dynamic/table/column/listColumns', method: 'GET' }
+export function getRegulatorRuleListColumns(data) {
+  return gatewayOrMock(META_getRegulatorRuleListColumns, mockGetRegulatorRuleListColumnsImpl, data)
+}
 
 /**
  * 类处理器联动（/configuation/regulatorinfo/config/queryByClassName，参数 {systemName, className}）
  * 原实现：选择类处理器后调用该接口初始化源/目标数据集与扩展参数（RegulatorRuleModal.changeRuleInfo / SubListRegulatorList.changeRuleInfo）
  * mock 返回 sourceAcct/targetAcct/regulatorInfoParams 示意结构（与后端 RegulatorInfo 一致），联调后替换为真实 Axios 调用
  */
-export const getRuleInfoByClassName = (data) =>
+const mockGetRuleInfoByClassNameImpl = (data) =>
   mockSimple({
     success: true,
     result: {
@@ -129,15 +165,35 @@ export const getRuleInfoByClassName = (data) =>
       ]
     }
   })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /configuation/regulatorinfo/config/queryByClassName */
+const META_getRuleInfoByClassName = { operationType: '', url: '/configuation/regulatorinfo/config/queryByClassName', method: 'GET' }
+export function getRuleInfoByClassName(data) {
+  return gatewayOrMock(META_getRuleInfoByClassName, mockGetRuleInfoByClassNameImpl, data)
+}
 
 /** 规则引用（/related/process/queryAssociatedRules，参数 {pkValue}；mock 返回空列表，无假数据） */
-export const getAssociatedRules = (data) => mockSimple({ success: true, result: [] })
+const mockGetAssociatedRulesImpl = (data) => mockSimple({ success: true, result: [] })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /related/process/queryAssociatedRules */
+const META_getAssociatedRules = { operationType: '', url: '/related/process/queryAssociatedRules', method: 'GET' }
+export function getAssociatedRules(data) {
+  return gatewayOrMock(META_getAssociatedRules, mockGetAssociatedRulesImpl, data)
+}
 
 /** 流程引用（/related/process/queryAssociatedFlowCorrelationRules，参数 {pkValue}；mock 返回空列表） */
-export const getAssociatedFlowRules = (data) => mockSimple({ success: true, result: [] })
+const mockGetAssociatedFlowRulesImpl = (data) => mockSimple({ success: true, result: [] })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /related/process/queryAssociatedFlowCorrelationRules */
+const META_getAssociatedFlowRules = { operationType: '', url: '/related/process/queryAssociatedFlowCorrelationRules', method: 'GET' }
+export function getAssociatedFlowRules(data) {
+  return gatewayOrMock(META_getAssociatedFlowRules, mockGetAssociatedFlowRulesImpl, data)
+}
 
 /** 交互引用（/related/process/queryAssociatedSwapCorrelationRules，参数 {pkValue}；mock 返回空列表） */
-export const getAssociatedSwapRules = (data) => mockSimple({ success: true, result: [] })
+const mockGetAssociatedSwapRulesImpl = (data) => mockSimple({ success: true, result: [] })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /related/process/queryAssociatedSwapCorrelationRules */
+const META_getAssociatedSwapRules = { operationType: '', url: '/related/process/queryAssociatedSwapCorrelationRules', method: 'GET' }
+export function getAssociatedSwapRules(data) {
+  return gatewayOrMock(META_getAssociatedSwapRules, mockGetAssociatedSwapRulesImpl, data)
+}
 
 /**
  * 规则处理器关联引用（/related/process/queryAssociatedRuleProcessor，参数 {pkValue}）
@@ -145,7 +201,7 @@ export const getAssociatedSwapRules = (data) => mockSimple({ success: true, resu
  * children 为引用该规则处理器的流程/规则名称列表（弹窗内搜索 + 分页展示，每页 15 条）；
  * mock 返回 17 条示例引用，联调后替换为真实 Axios 调用
  */
-export const getAssociatedRuleProcessor = (data) =>
+const mockGetAssociatedRuleProcessorImpl = (data) =>
   mockSimple({
     success: true,
     result: {
@@ -172,3 +228,8 @@ export const getAssociatedRuleProcessor = (data) =>
       ]
     }
   })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /related/process/queryAssociatedRuleProcessor */
+const META_getAssociatedRuleProcessor = { operationType: '', url: '/related/process/queryAssociatedRuleProcessor', method: 'GET' }
+export function getAssociatedRuleProcessor(data) {
+  return gatewayOrMock(META_getAssociatedRuleProcessor, mockGetAssociatedRuleProcessorImpl, data)
+}

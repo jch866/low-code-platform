@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 开发组件 API mock（对应 Vue2 源组件 JSelectProjectByDep / JSelectProjectByDepModal，按部门选项目）
@@ -96,24 +97,49 @@ const queryProjectPage = (data) => {
 }
 
 /** 全量组织机构树（原 GET /sys/sysDepart/queryTreeList） */
-export const queryDepartTreeList = () => mockSimple({ result: mockDepartTree })
+const mockQueryDepartTreeListImpl = () => mockSimple({ result: mockDepartTree })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/sysDepart/queryTreeList */
+const META_queryDepartTreeList = { operationType: '', url: '/sys/sysDepart/queryTreeList', method: 'GET' }
+export function queryDepartTreeList() {
+  return gatewayOrMock(META_queryDepartTreeList, mockQueryDepartTreeListImpl)
+}
 
 /** 当前用户有权限的部门树（原 GET /sys/sysDepart/queryChildTreeList，userOwn=true 时调用） */
-export const queryChildDepartTreeList = () => mockSimple({ result: mockChildDepartTree })
+const mockQueryChildDepartTreeListImpl = () => mockSimple({ result: mockChildDepartTree })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/sysDepart/queryChildTreeList */
+const META_queryChildDepartTreeList = { operationType: '', url: '/sys/sysDepart/queryChildTreeList', method: 'GET' }
+export function queryChildDepartTreeList() {
+  return gatewayOrMock(META_queryChildDepartTreeList, mockQueryChildDepartTreeListImpl)
+}
 
 /** 部门关键字搜索（原 GET /sys/sysDepart/searchBy，参数 {keyWord}，命中后整棵替换左侧树） */
-export const searchByKeywords = (data) => {
+const mockSearchByKeywordsImpl = (data) => {
   const { keyWord = '' } = data
   const tree = filterTreeByKeyword(mockDepartTree, keyWord)
   return mockSimple({ result: tree })
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/sysDepart/searchBy */
+const META_searchByKeywords = { operationType: '', url: '/sys/sysDepart/searchBy', method: 'GET' }
+export function searchByKeywords(data) {
+  return gatewayOrMock(META_searchByKeywords, mockSearchByKeywordsImpl, data)
+}
 
 /** 项目列表（原 GET /develop/project/list，getProjectList） */
-export const getProjectList = (data) => queryProjectPage(data)
+const mockGetProjectListImpl = (data) => queryProjectPage(data)
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /develop/project/list */
+const META_getProjectList = { operationType: '', url: '/develop/project/list', method: 'GET' }
+export function getProjectList(data) {
+  return gatewayOrMock(META_getProjectList, mockGetProjectListImpl, data)
+}
 
 /** 按部门主键查询项目（原 GET /develop/project/list，queryProjectByDepId，仅额外传 departId） */
-export const queryProjectByDepId = (data) =>
+const mockQueryProjectByDepIdImpl = (data) =>
   queryProjectPage({ ...data, pageNo: 1, pageSize: 10, column: 'createTime', order: 'desc' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /develop/project/list（与 getProjectList 同地址） */
+const META_queryProjectByDepId = { operationType: '', url: '/develop/project/list', method: 'GET' }
+export function queryProjectByDepId(data) {
+  return gatewayOrMock(META_queryProjectByDepId, mockQueryProjectByDepIdImpl, data)
+}
 
 /**
  * 比对数据环境选择（迁移自 Vue2 工程 views/develop/modules/DevelopProjectEnviSelectModal）
@@ -124,10 +150,20 @@ const mockEnvis = [
   { enviCode: 'SIT', enviName: '测试环境' },
   { enviCode: 'PROD', enviName: '生产环境' }
 ]
-export const getDevelopAllEnvis = () => mockResponse(mockEnvis)
+const mockGetDevelopAllEnvisImpl = () => mockResponse(mockEnvis)
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /develop/environment/getAllEnvis */
+const META_getDevelopAllEnvis = { operationType: '', url: '/develop/environment/getAllEnvis', method: 'GET' }
+export function getDevelopAllEnvis() {
+  return gatewayOrMock(META_getDevelopAllEnvis, mockGetDevelopAllEnvisImpl)
+}
 
 /**
  * 按目标环境取记录详情（原 GET /dynamic/table/data/fetchByIdWithEnvi，参数 {id, envi}，
  * 返回目标环境记录（含 dataValueObject）或 null，供跨环境数据比对）
  */
-export const getDynamicTableFetchByIdWithEnvi = () => mockSimple({ result: null })
+const mockGetDynamicTableFetchByIdWithEnviImpl = () => mockSimple({ result: null })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/data/fetchByIdWithEnvi */
+const META_getDynamicTableFetchByIdWithEnvi = { operationType: '', url: '/dynamic/table/data/fetchByIdWithEnvi', method: 'GET' }
+export function getDynamicTableFetchByIdWithEnvi() {
+  return gatewayOrMock(META_getDynamicTableFetchByIdWithEnvi, mockGetDynamicTableFetchByIdWithEnviImpl)
+}

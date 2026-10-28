@@ -1,4 +1,5 @@
 import { mockResponse, mockSimple } from './common'
+import { gatewayOrMock } from './gateway'
 
 /**
  * 支付业务 API（对应 Vue2 源页面 PayList.vue / PayListDisplay.vue 左树 + 右侧内容布局）
@@ -95,45 +96,100 @@ const flattenTree = (nodes, parentId = '') => {
 }
 
 /** 交易树（原 queryTransTreeList） */
-export const queryTransTreeList = () => mockResponse(JSON.parse(JSON.stringify(mockTreeList)))
+const mockQueryTransTreeListImpl = () => mockResponse(JSON.parse(JSON.stringify(mockTreeList)))
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/payment/queryTransList */
+const META_queryTransTreeList = { operationType: '', url: '/product/payment/queryTransList', method: 'GET' }
+export function queryTransTreeList() {
+  return gatewayOrMock(META_queryTransTreeList, mockQueryTransTreeListImpl)
+}
 
 /** 上级交易树（原 PayInfoModal 内 queryIdTree，数据源同交易树） */
-export const queryIdTree = () => mockResponse(JSON.parse(JSON.stringify(mockTreeList)))
+const mockQueryIdTreeImpl = () => mockResponse(JSON.parse(JSON.stringify(mockTreeList)))
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/sysDepart/queryIdTree（源 @/api/api queryIdTree） */
+const META_queryIdTree = { operationType: '', url: '/sys/sysDepart/queryIdTree', method: 'GET' }
+export function queryIdTree() {
+  return gatewayOrMock(META_queryIdTree, mockQueryIdTreeImpl)
+}
 
 /** 树关键字搜索（原 searchTransByKeywords({keyWord})，mock 按交易名称过滤后平铺返回） */
-export const searchTransByKeywords = (data) => {
+const mockSearchTransByKeywordsImpl = (data) => {
   const keyWord = data.keyWord || ''
   const matched = flattenTree(mockTreeList).filter((i) => i.transName.includes(keyWord))
   return mockResponse(matched, matched.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: （原注释未提供真实 URL，联调时补充） */
+const META_searchTransByKeywords = { operationType: '', url: '', method: 'GET' }
+export function searchTransByKeywords(data) {
+  return gatewayOrMock(META_searchTransByKeywords, mockSearchTransByKeywordsImpl, data)
+}
 
 /** 交易节点列表（右侧列表，平铺交易树） */
-export const getPaymentTransList = (data) => {
+const mockGetPaymentTransListImpl = (data) => {
   const keyWord = (data && data.keyWord) || ''
   const list = flattenTree(mockTreeList).filter((i) => i.transName.includes(keyWord))
   return mockResponse(list, list.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: （原注释未提供真实 URL，联调时补充） */
+const META_getPaymentTransList = { operationType: '', url: '', method: 'GET' }
+export function getPaymentTransList(data) {
+  return gatewayOrMock(META_getPaymentTransList, mockGetPaymentTransListImpl, data)
+}
 
 /** 新增交易（原 PayInfoModal 恒 POST /product/payment/add） */
-export const getPaymentAdd = (data) => mockSimple({ resultMsg: '新增成功' })
+const mockGetPaymentAddImpl = (data) => mockSimple({ resultMsg: '新增成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /product/payment/add */
+const META_getPaymentAdd = { operationType: '', url: '/product/payment/add', method: 'POST' }
+export function getPaymentAdd(data) {
+  return gatewayOrMock(META_getPaymentAdd, mockGetPaymentAddImpl, data)
+}
 
 /** 修改并保存（原 tab1 表单 submitCurrForm，PUT /product/payment/edit） */
-export const getPaymentEdit = (data) => mockSimple({ resultMsg: '修改成功' })
+const mockGetPaymentEditImpl = (data) => mockSimple({ resultMsg: '修改成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /product/payment/edit */
+const META_getPaymentEdit = { operationType: '', url: '/product/payment/edit', method: 'PUT' }
+export function getPaymentEdit(data) {
+  return gatewayOrMock(META_getPaymentEdit, mockGetPaymentEditImpl, data)
+}
 
 /** 行删除（原 deleteByTransId({id})，URL /product/payment/delete） */
-export const deleteByTransId = (data) => mockSimple({ resultMsg: '删除成功!' })
+const mockDeleteByTransIdImpl = (data) => mockSimple({ resultMsg: '删除成功!' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/payment/delete */
+const META_deleteByTransId = { operationType: '', url: '/product/payment/delete', method: 'GET' }
+export function deleteByTransId(data) {
+  return gatewayOrMock(META_deleteByTransId, mockDeleteByTransIdImpl, data)
+}
 
 /** 批量删除（原 deleteAction /product/payment/deleteBatch，{ids: checkedKeys 拼接}） */
-export const getPaymentDeleteBatch = (data) => mockSimple({ resultMsg: '批量删除成功' })
+const mockGetPaymentDeleteBatchImpl = (data) => mockSimple({ resultMsg: '批量删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/payment/deleteBatch */
+const META_getPaymentDeleteBatch = { operationType: '', url: '/product/payment/deleteBatch', method: 'GET' }
+export function getPaymentDeleteBatch(data) {
+  return gatewayOrMock(META_getPaymentDeleteBatch, mockGetPaymentDeleteBatchImpl, data)
+}
 
 /** 导出交易信息（原 handleExportXls('交易信息')，URL product/payment/exportXls） */
-export const getPaymentExportXls = (data) => mockSimple({ resultMsg: '导出成功' })
+const mockGetPaymentExportXlsImpl = (data) => mockSimple({ resultMsg: '导出成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET product/payment/exportXls（原注释无前导斜杠） */
+const META_getPaymentExportXls = { operationType: '', url: 'product/payment/exportXls', method: 'GET' }
+export function getPaymentExportXls(data) {
+  return gatewayOrMock(META_getPaymentExportXls, mockGetPaymentExportXlsImpl, data)
+}
 
 /** 导入交易信息（原 a-upload，URL product/payment/importExcel） */
-export const getPaymentImportExcel = (data) => mockSimple({ resultMsg: '导入成功' })
+const mockGetPaymentImportExcelImpl = (data) => mockSimple({ resultMsg: '导入成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST product/payment/importExcel（原 a-upload 上传，无前导斜杠） */
+const META_getPaymentImportExcel = { operationType: '', url: 'product/payment/importExcel', method: 'POST' }
+export function getPaymentImportExcel(data) {
+  return gatewayOrMock(META_getPaymentImportExcel, mockGetPaymentImportExcelImpl, data)
+}
 
 /** 模块管理（原 PayModel.vue / ModuleInfoModal.vue，POST /product/module/add，仅新增） */
-export const getPaymentModuleAdd = (data) => mockSimple({ resultMsg: '新增成功' })
+const mockGetPaymentModuleAddImpl = (data) => mockSimple({ resultMsg: '新增成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: POST /product/module/add */
+const META_getPaymentModuleAdd = { operationType: '', url: '/product/module/add', method: 'POST' }
+export function getPaymentModuleAdd(data) {
+  return gatewayOrMock(META_getPaymentModuleAdd, mockGetPaymentModuleAddImpl, data)
+}
 
 /** 模块树 mock（原 queryProductModuleTreeList 返回结构：{key,title,children} + 模块实体字段） */
 const mockModuleTree = [
@@ -200,31 +256,66 @@ const flattenModuleTree = (nodes) => {
 }
 
 /** 模块树（原 queryProductModuleTreeList，GET /product/module/queryModuleList） */
-export const getPaymentModuleTreeList = () => mockResponse(JSON.parse(JSON.stringify(mockModuleTree)))
+const mockGetPaymentModuleTreeListImpl = () => mockResponse(JSON.parse(JSON.stringify(mockModuleTree)))
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/module/queryModuleList */
+const META_getPaymentModuleTreeList = { operationType: '', url: '/product/module/queryModuleList', method: 'GET' }
+export function getPaymentModuleTreeList() {
+  return gatewayOrMock(META_getPaymentModuleTreeList, mockGetPaymentModuleTreeListImpl)
+}
 
 /** 上级模块树（原 queryProductModuleIdTree，GET /product/module/queryIdTree） */
-export const getPaymentModuleIdTree = () => mockResponse(JSON.parse(JSON.stringify(mockModuleTree)))
+const mockGetPaymentModuleIdTreeImpl = () => mockResponse(JSON.parse(JSON.stringify(mockModuleTree)))
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/module/queryIdTree */
+const META_getPaymentModuleIdTree = { operationType: '', url: '/product/module/queryIdTree', method: 'GET' }
+export function getPaymentModuleIdTree() {
+  return gatewayOrMock(META_getPaymentModuleIdTree, mockGetPaymentModuleIdTreeImpl)
+}
 
 /** 模块关键字搜索（原 searchProductModuleByKeywords({keyWord})，GET /product/module/searchBy，mock 按模块名称过滤后平铺返回） */
-export const searchProductModuleByKeywords = (data) => {
+const mockSearchProductModuleByKeywordsImpl = (data) => {
   const keyWord = (data && data.keyWord) || ''
   const matched = flattenModuleTree(JSON.parse(JSON.stringify(mockModuleTree))).filter((i) => (i.moduleName || '').includes(keyWord))
   return mockResponse(matched, matched.length)
 }
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/module/searchBy */
+const META_searchProductModuleByKeywords = { operationType: '', url: '/product/module/searchBy', method: 'GET' }
+export function searchProductModuleByKeywords(data) {
+  return gatewayOrMock(META_searchProductModuleByKeywords, mockSearchProductModuleByKeywordsImpl, data)
+}
 
 /** 修改模块（原 PayModel.vue submitCurrForm，PUT /product/module/edit，payload=节点原始字段+表单值） */
-export const getPaymentModuleEdit = (data) => mockSimple({ resultMsg: '操作成功' })
+const mockGetPaymentModuleEditImpl = (data) => mockSimple({ resultMsg: '操作成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /product/module/edit */
+const META_getPaymentModuleEdit = { operationType: '', url: '/product/module/edit', method: 'PUT' }
+export function getPaymentModuleEdit(data) {
+  return gatewayOrMock(META_getPaymentModuleEdit, mockGetPaymentModuleEditImpl, data)
+}
 
 /** 删除模块（原 deleteByProductModuleId({id})，GET /product/module/delete） */
-export const deleteByProductModuleId = (data) => mockSimple({ resultMsg: '删除成功!' })
+const mockDeleteByProductModuleIdImpl = (data) => mockSimple({ resultMsg: '删除成功!' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/module/delete */
+const META_deleteByProductModuleId = { operationType: '', url: '/product/module/delete', method: 'GET' }
+export function deleteByProductModuleId(data) {
+  return gatewayOrMock(META_deleteByProductModuleId, mockDeleteByProductModuleIdImpl, data)
+}
 
 /** 批量删除模块（原 deleteAction /product/module/deleteBatch，{ids: 树勾选 checkedKeys 拼接}） */
-export const getPaymentModuleDeleteBatch = (data) => mockSimple({ resultMsg: '删除成功' })
+const mockGetPaymentModuleDeleteBatchImpl = (data) => mockSimple({ resultMsg: '删除成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /product/module/deleteBatch */
+const META_getPaymentModuleDeleteBatch = { operationType: '', url: '/product/module/deleteBatch', method: 'GET' }
+export function getPaymentModuleDeleteBatch(data) {
+  return gatewayOrMock(META_getPaymentModuleDeleteBatch, mockGetPaymentModuleDeleteBatchImpl, data)
+}
 
 /** 模块类目字典（原 j-dict-select-tag dictCode=module_category，真实字典项走
  *  GET /sys/dict/config/getDictItems/module_category，mock 暂以占位项代替，联调时替换） */
-export const getModuleCategoryDict = () =>
+const mockGetModuleCategoryDictImpl = () =>
   mockResponse([
     { value: '1', label: '模块类目一' },
     { value: '2', label: '模块类目二' }
   ])
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /sys/dict/config/getDictItems/module_category */
+const META_getModuleCategoryDict = { operationType: '', url: '/sys/dict/config/getDictItems/module_category', method: 'GET' }
+export function getModuleCategoryDict() {
+  return gatewayOrMock(META_getModuleCategoryDict, mockGetModuleCategoryDictImpl)
+}
