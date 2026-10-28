@@ -315,13 +315,6 @@
       </template>
     </ep-dialog>
 
-    <!-- 占位弹窗（导出DDL / 导出Sql 等复杂功能） -->
-    <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="30%">
-      <div class="placeholder-block">{{ state.placeholderText }}</div>
-      <template #footer>
-        <ep-button plain @click="state.placeholderVisible = false">关闭</ep-button>
-      </template>
-    </ep-dialog>
   </div>
 </template>
 
@@ -341,6 +334,8 @@ import {
 } from '@/api/lowCodePlatform/dynamicTable'
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
+// 已迁移：downFile 下载封装（导出DDL/导出Sql 真实下载，接口待联调）
+import downFile from '@/utils/downFile'
 
 const formRef = ref(null)
 
@@ -479,10 +474,7 @@ const state = reactive({
   columnRows: [],
   indexRows: [],
   // 三态删除确认
-  batchDelVisible: false,
-  // 占位弹窗
-  placeholderVisible: false,
-  placeholderText: ''
+  batchDelVisible: false
 })
 
 /** 顶部按钮（原为「批量操作」下拉：删除/导出DDL/导出Sql，选中行 > 0 时才出现，此处平铺为按钮；权限码见注释） */
@@ -497,16 +489,14 @@ const buttonGroups = computed(() => [
     methods: () => openBatchDelete()
   },
   {
-    text: '导出DDL', // 权限码: dynamic:table:ddl:export
+    text: '导出DDL', // 权限码: dynamic:table:ddl:export；已迁移 downFile 下载封装
     isShow: state.selectedRows.length > 0,
-    methods: () =>
-      onPlaceholder('原功能 导出DDL（/dynamic/table/exportBatchSql，sqlType=DDL），待迁移')
+    methods: () => onExportBatchSql('DDL')
   },
   {
-    text: '导出Sql', // 权限码: dynamic:table:export
+    text: '导出Sql', // 权限码: dynamic:table:export；已迁移 downFile 下载封装
     isShow: state.selectedRows.length > 0,
-    methods: () =>
-      onPlaceholder('原功能 导出Sql（/dynamic/table/exportBatchSql，sqlType=DML），待迁移')
+    methods: () => onExportBatchSql('DML')
   }
 ])
 
@@ -703,10 +693,19 @@ const handleBatchDelete = debounce(async (flag) => {
   }
 })
 
-/** 占位弹窗（导出DDL / 导出Sql） */
-const onPlaceholder = (text) => {
-  state.placeholderText = text
-  state.placeholderVisible = true
+/**
+ * 批量导出 SQL（已迁移 downFile 下载封装：原 mixin exportBatchSql → downFile('/dynamic/table/exportBatchSql', {ids, sqlType})，
+ * sqlType 取值 DDL-数据库定义语言 / DML-数据库管理语言（不传默认 DML），文件名默认 yyyyMMddHHmmss.sql；
+ * 后端接口暂不通，失败时统一提示，联调后仅后端可用即真实下载）
+ */
+const onExportBatchSql = async (sqlType) => {
+  const ids = state.selectedRows.map((row) => row.id).join(',')
+  try {
+    // 真实接口：GET /dynamic/table/exportBatchSql（参数 ids、sqlType）
+    await downFile('/dynamic/table/exportBatchSql', { ids, sqlType })
+  } catch (e) {
+    EPMessageTips('warning', '导出功能已迁移，接口待联调')
+  }
 }
 
 /* 分页器相关操作 */
@@ -753,14 +752,6 @@ onMounted(() => {
   color: #b26a00;
   background: #fff7e6;
   border-radius: 4px;
-}
-.placeholder-block {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  color: #999;
-  background: #f7f9fd;
 }
 .button-text {
   padding: 0;

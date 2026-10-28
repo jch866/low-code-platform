@@ -114,3 +114,20 @@ export const getProjectList = (data) => queryProjectPage(data)
 /** 按部门主键查询项目（原 GET /develop/project/list，queryProjectByDepId，仅额外传 departId） */
 export const queryProjectByDepId = (data) =>
   queryProjectPage({ ...data, pageNo: 1, pageSize: 10, column: 'createTime', order: 'desc' })
+
+/**
+ * 比对数据环境选择（迁移自 Vue2 工程 views/develop/modules/DevelopProjectEnviSelectModal）
+ * 查询全部比对环境（原 GET /develop/environment/getAllEnvis，返回 [{enviCode, enviName}]）
+ */
+const mockEnvis = [
+  { enviCode: 'DEV', enviName: '开发环境' },
+  { enviCode: 'SIT', enviName: '测试环境' },
+  { enviCode: 'PROD', enviName: '生产环境' }
+]
+export const getDevelopAllEnvis = () => mockResponse(mockEnvis)
+
+/**
+ * 按目标环境取记录详情（原 GET /dynamic/table/data/fetchByIdWithEnvi，参数 {id, envi}，
+ * 返回目标环境记录（含 dataValueObject）或 null，供跨环境数据比对）
+ */
+export const getDynamicTableFetchByIdWithEnvi = () => mockSimple({ result: null })

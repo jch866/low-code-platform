@@ -118,7 +118,7 @@
     </TableBlock>
 
     <!-- 新增编辑 抽屉（原 a-drawer placement=right，drawerWidth=700；@eigpay/components 未提供抽屉组件，以固定定位面板模拟；
-         footer 原为 SubmitFooterWithReq 带开发需求码，待迁移） -->
+         footer 已迁移 SubmitFooterWithReq 带开发需求码） -->
     <div v-if="state.drawerVisible" class="drawer-mask" @click.self="handleCancel">
       <div class="drawer-panel" :style="{ width: '700px' }">
         <div class="drawer-header">
@@ -208,7 +208,7 @@
               </ep-radio-group>
             </ep-form-item>
             <ep-form-item prop="epfFlowNodeIcon" label="流程节点图标">
-              <!-- 原组件: Icons（图标选择弹窗 @choose/@close/:iconChooseVisible），待迁移 -->
+              <!-- 已迁移 Icons 图标选择弹窗（原 @choose/@close/:iconChooseVisible，选中回写 epfFlowNodeIcon） -->
               <div class="inline-fields">
                 <ep-input v-model="state.form.epfFlowNodeIcon" placeholder="请选择图标" type="text" />
                 <ep-button plain type="primary" @click="onOpenIconSelect">选择图标</ep-button>
@@ -225,9 +225,13 @@
           </ep-form>
         </div>
         <div class="drawer-footer">
-          <!-- 原组件: SubmitFooterWithReq（带开发需求码 requireCode），待迁移 -->
-          <ep-button plain @click="handleCancel">关闭</ep-button>
-          <ep-button type="primary" @click="onClickSubmit">提交</ep-button>
+          <!-- 已迁移 SubmitFooterWithReq：requireCode 输入 + 取消/提交（事件接回原 handleCancel/onClickSubmit） -->
+          <SubmitFooterWithReq
+            ref="reqSelectRef"
+            :require-code-param="state.requireCodeParam"
+            @ok="onClickSubmit"
+            @cancel="handleCancel"
+          />
         </div>
       </div>
     </div>
@@ -269,15 +273,15 @@
       </div>
     </ep-dialog>
 
-    <!-- 待迁移功能 占位弹窗（数据比对/图标选择/导出SQL；历史记录已改为真实跳转） -->
-    <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="480px">
-      <div class="placeholder-body">{{ state.placeholderText }}</div>
-      <template #footer>
-        <span>
-          <ep-button plain @click="state.placeholderVisible = false">关闭</ep-button>
-        </span>
-      </template>
-    </ep-dialog>
+    <!-- 已迁移 Icons 图标选择弹窗（图标选择入口，选中回写 model.epfFlowNodeIcon） -->
+    <Icons
+      :icon-choose-visible="state.iconChooseVisible"
+      @choose="onIconChoose"
+      @close="state.iconChooseVisible = false"
+    />
+
+    <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(row) 打开） -->
+    <DevelopProjectEnviSelectModal ref="enviSelectRef" />
   </div>
 </template>
 
@@ -293,14 +297,21 @@ import {
   getFlowNodeAdd,
   getFlowNodeEdit,
   getFlowNodeDelete,
-  getFlowNodeExportBatchSql,
   getFlowNodeDuplicateCheck,
   getAssociatedProcessNodes
 } from '@/api/lowCodePlatform/flowNode'
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
+// 已迁移组件：Icons 图标选择弹窗 / SubmitFooterWithReq 提交底栏（开发需求码） / DevelopProjectEnviSelectModal 比对数据环境选择
+import Icons from '@/components/icons/Icons.vue'
+import SubmitFooterWithReq from '@/components/submitFooterWithReq/SubmitFooterWithReq.vue'
+import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
+import downFile from '@/utils/downFile'
 
 const formRef = ref(null)
+// SubmitFooterWithReq（读取 requireCode 作为 developRequire 提交参数）与比对环境选择弹窗
+const reqSelectRef = ref(null)
+const enviSelectRef = ref(null)
 const router = useRouter()
 
 // TODO: 联调后接入表字典 local|develop_system,system_name,system_code（所属应用下拉/单选，联调前保持为空）
@@ -450,16 +461,17 @@ const state = reactive({
   title: '',
   id: '',
   form: { ...form },
+  // 开发需求码（原编辑回显 model.developRequire 传入 SubmitFooterWithReq.requireCodeParam）
+  requireCodeParam: '',
+  // 图标选择弹窗显隐（已迁移 Icons）
+  iconChooseVisible: false,
   // 删除
   dialogVisibleDel: false,
   // 查看关联引用 弹窗
   refVisible: false,
   refTitle: '',
   refData: [],
-  searchKeyword: '',
-  // 占位弹窗
-  placeholderVisible: false,
-  placeholderText: ''
+  searchKeyword: ''
 })
 
 /** 关联引用前端过滤（原 filterData 按 name/code 过滤） */
@@ -524,6 +536,7 @@ const handleAdd = () => {
   state.title = '节点新增'
   state.id = ''
   state.form = { ...form }
+  state.requireCodeParam = ''
 }
 
 /** 编辑（原覆写 handleEdit，title="{节点}{编辑}"→"节点编辑"；name/code 编辑态只读） */
@@ -545,6 +558,8 @@ const handleEdit = (row) => {
     epfFlowNodeIcon: row.epfFlowNodeIcon || '',
     epfFlowNodeRemark: row.epfFlowNodeRemark || ''
   }
+  // 回显开发需求码给 SubmitFooterWithReq（原 $refs.reqSelect.requireCode=record.developRequire）
+  state.requireCodeParam = row.developRequire || ''
 }
 
 /** 取消（关闭抽屉） */
@@ -563,13 +578,19 @@ const checkDuplicate = async (fieldName, fieldVal, label) => {
   return true
 }
 
-/** 图标选择（原组件: Icons 图标选择弹窗，选中后写 model.epfFlowNodeIcon，待迁移） */
+/** 图标选择（已迁移 Icons：打开弹窗，选中后回写 model.epfFlowNodeIcon） */
 const onOpenIconSelect = () => {
-  state.placeholderVisible = true
-  state.placeholderText = '原组件 Icons（图标选择弹窗 @choose/@close/:iconChooseVisible），待迁移'
+  state.iconChooseVisible = true
 }
 
-/** 提交（原提交 Object.assign(model, values) + developRequire/developEnvi——需求码组件未迁移） */
+/** 图标选中回调（原 @choose → model.epfFlowNodeIcon = 图标类名） */
+const onIconChoose = (icon) => {
+  state.form.epfFlowNodeIcon = icon
+  state.iconChooseVisible = false
+}
+
+/** 提交（原提交 Object.assign(model, values) + developRequire/developEnvi；
+ *  developRequire 已接 SubmitFooterWithReq.requireCode；developEnvi 来自 vuex getter，子应用无该模块未迁移） */
 const onClickSubmit = debounce(async () => {
   const { isValid } = await formRef.value.validate()
   if (!isValid) return
@@ -578,7 +599,11 @@ const onClickSubmit = debounce(async () => {
   if (!passName) return
   const passCode = await checkDuplicate('epf_flow_node_code', state.form.epfFlowNodeCode, '节点编码')
   if (!passCode) return
-  const param = { ...state.form }
+  const param = {
+    ...state.form,
+    // 原 formData.developRequire = this.$refs.reqSelect.requireCode（SubmitFooterWithReq 需求码）
+    developRequire: reqSelectRef.value?.requireCode || null
+  }
   // 原 add 为 postAction("/flownode/manage/config/add")；edit 为 putAction("/flownode/manage/config/edit")
   let apiUrl = ''
   if (state.id) {
@@ -612,13 +637,17 @@ const handleDelete = debounce(async () => {
   }
 })
 
-/** 导出SQL（原 mixin exportBatchSql → downFile(/flownode/manage/config/exportBatchSql, {ids, sqlType})，mock 环境仅调用占位） */
+/**
+ * 导出SQL（已迁移 downFile 下载封装：原 mixin exportBatchSql → downFile('/flownode/manage/config/exportBatchSql', {ids, sqlType})，
+ * 文件名默认 yyyyMMddHHmmss.sql；后端接口暂不通，失败时统一提示，联调后仅后端可用即真实下载）
+ */
 const onExportBatchSql = async () => {
   const ids = state.selectedRows.map((row) => row.id).join(',')
-  const res = await getFlowNodeExportBatchSql({ ids, sqlType: 'DML' })
-  if (res.returnCode === SUCCESS_STATUS) {
-    state.placeholderVisible = true
-    state.placeholderText = '原通过 downFile 下载 /flownode/manage/config/exportBatchSql（参数 ids、sqlType=DML），下载组件待迁移'
+  try {
+    // 真实接口：GET /flownode/manage/config/exportBatchSql（参数 ids、sqlType=DML）
+    await downFile('/flownode/manage/config/exportBatchSql', { ids, sqlType: 'DML' })
+  } catch (e) {
+    EPMessageTips('warning', '导出功能已迁移，接口待联调')
   }
 }
 
@@ -639,10 +668,9 @@ const onHistory = (row) => {
   router.push('/lowCodePlatform/dynamicHistory/list')
 }
 
-/** 数据比对（原组件: DevelopProjectEnviSelectModal，title=比对数据环境选择，待迁移） */
+/** 数据比对（已迁移 DevelopProjectEnviSelectModal：title=比对数据环境选择，原 ref.edit(record) 打开） */
 const onEnviSelect = (row) => {
-  state.placeholderVisible = true
-  state.placeholderText = '原组件 DevelopProjectEnviSelectModal（比对数据环境选择），待迁移'
+  enviSelectRef.value?.edit(row)
 }
 
 /** 查看关联引用（原 showRegulatorProcessModal → /related/process/queryAssociatedProcessNodes {pkValue}，title=节点处理器+节点名称） */
@@ -768,9 +796,5 @@ onMounted(() => {
   color: #999;
   text-align: center;
   padding: 16px 0;
-}
-.placeholder-body {
-  color: #999;
-  padding: 12px 0;
 }
 </style>

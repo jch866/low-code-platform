@@ -94,7 +94,7 @@
       </template>
     </TableBlock>
 
-    <!-- 新增编辑 弹窗（原 a-modal 全屏宽 width='100%'，编辑态 readOnly=true；footer 原为 SubmitFooterWithReq 带开发需求码，待迁移） -->
+    <!-- 新增编辑 弹窗（原 a-modal 全屏宽 width='100%'，编辑态 readOnly=true；footer 已迁移 SubmitFooterWithReq 带开发需求码） -->
     <ep-dialog
       v-model="state.dialogVisible"
       :title="state.title"
@@ -184,83 +184,90 @@
             @change="onChangeRuleInfo"
           />
         </ep-form-item>
-        <!-- 异常信息：恒显；原组件: ErrorInfo（errorCode/errorMessage），待迁移，暂用两个输入框占位 -->
+        <!-- 异常信息：已简化实现（原组件 ErrorInfo：errorCode 为字典 error_code 下拉 + errorMessage 输入框，本页以两个输入框等价占位，联调后可换字典下拉） -->
         <ep-form-item label="异常信息">
           <div class="inline-fields">
             <ep-input v-model="state.form.errorCode" placeholder="异常编码 errorCode" type="text" />
             <ep-input v-model="state.form.errorMessage" placeholder="异常信息 errorMessage" type="text" />
           </div>
         </ep-form-item>
-        <!-- 校验结果：多决策/合并显示；原组件: ValidateResult，待迁移 -->
+        <!-- 校验结果：已迁移 ValidateResult（原路径 ./modules/result/ValidateResult）；结果对象按引用传入，子组件变更直接回写（等价源 .sync） -->
         <ep-form-item
           v-if="state.form.regulatorSubType === 'MUTIL_DECISION' || state.form.regulatorSubType === 'JOIN'"
           label="校验结果"
         >
-          <div class="sub-panel">
-            <span class="placeholder-tip">子组件 ValidateResult（原路径 ./modules/result/ValidateResult），待迁移</span>
-          </div>
+          <ValidateResult :result-rule-param-props="state.form.resultRule" />
         </ep-form-item>
-        <!-- 规则分组设置：原组件: GroupSet（原路径 ./modules/group/GroupSet），待迁移；多决策/多渲染 + 子表规则 + 数据赋值场景均含该区块 -->
+        <!-- 规则分组设置：已迁移 GroupSet（原路径 ./modules/group/GroupSet）；isGroup 同步 model.hasGroup，分组行深变更 emit call（源 modal setGroupSet） -->
         <ep-form-item
           v-if="subTypeOptions.some((s) => s.value === state.form.regulatorSubType && s.hasGroup)"
           label="规则分组设置"
         >
-          <div class="sub-panel">
-            <span class="placeholder-tip">子组件 GroupSet（原路径 ./modules/group/GroupSet），待迁移</span>
-          </div>
+          <GroupSet
+            v-model:is-group-prop="state.form.hasGroup"
+            :group-sets-param="state.form.groupSets"
+            @call="setGroupSet"
+          />
         </ep-form-item>
-        <!-- 子规则列表：多决策/多渲染；原组件: ChildRegulatorList（原路径 ./modules/child/ChildRegulatorList），待迁移 -->
+        <!-- 子规则列表：已迁移 ChildRegulatorList（原路径 ./modules/child/ChildRegulatorList） -->
         <ep-form-item
           v-if="state.form.regulatorSubType === 'MUTIL_DECISION' || state.form.regulatorSubType === 'MUTIL_RENDER'"
           label="子规则列表"
         >
-          <div class="sub-panel">
-            <span class="placeholder-tip">子组件 ChildRegulatorList（原路径 ./modules/child/ChildRegulatorList），待迁移</span>
-          </div>
+          <ChildRegulatorList
+            v-model:regulator-childs-param="state.form.regulatorChilds"
+            :group-sets-param="state.form.groupSets"
+          />
         </ep-form-item>
-        <!-- 子表规则配置：多决策子表/多渲染子表；原组件: SubListRegulatorList，待迁移 -->
+        <!-- 子表规则配置：已迁移 SubListRegulatorList（原路径 modules/sublist/SubListRegulatorList）；子表多决策/多渲染共用，规则子类型与所属系统用于新增子节点联动 -->
         <ep-form-item
           v-if="state.form.regulatorSubType === 'MUTIL_DECISION_SUBLIST' || state.form.regulatorSubType === 'MUTIL_RENDER_SUBLIST'"
           label="子表规则配置"
         >
-          <div class="sub-panel">
-            <span class="placeholder-tip">子组件 SubListRegulatorList（原路径 modules/sublist/SubListRegulatorList），待迁移</span>
-          </div>
+          <SubListRegulatorList
+            v-model:regulator-sub-list-param="state.form.regulatorChilds"
+            :group-sets-param="state.form.groupSets"
+            :regulator-sub-type-param="state.form.regulatorSubType"
+            :system-name-param="state.form.systemName"
+          />
         </ep-form-item>
-        <!-- 数据赋值配置：原组件: DataAssign（原路径 ./modules/assgin/DataAssign），待迁移 -->
+        <!-- 赋值配置：已迁移 DataAssign（原路径 ./modules/assgin/DataAssign） -->
         <ep-form-item
           v-if="state.form.regulatorSubType === 'DATA_ASSIGN'"
           label="赋值配置"
         >
-          <div class="sub-panel">
-            <span class="placeholder-tip">子组件 DataAssign（原路径 ./modules/assgin/DataAssign），待迁移</span>
-          </div>
+          <DataAssign
+            v-model:regulator-childs-param="state.form.regulatorChilds"
+            :group-sets-param="state.form.groupSets"
+          />
         </ep-form-item>
-        <!-- 合并规则配置：合并(JOIN)；原组件: DecisionRule（原路径 ./modules/rule/DecisionRule），待迁移 -->
+        <!-- 合并规则配置：已迁移 DecisionRule（原路径 ./modules/rule/DecisionRule） -->
         <ep-form-item
           v-if="state.form.regulatorSubType === 'JOIN'"
           label="合并规则配置"
         >
-          <div class="sub-panel">
-            <span class="placeholder-tip">子组件 DecisionRule（原路径 ./modules/rule/DecisionRule），待迁移</span>
-          </div>
+          <DecisionRule v-model:regulator-childs-param="state.form.regulatorChilds" />
         </ep-form-item>
-        <!-- 单决策/单渲染 源/目标数据集与扩展参数；原组件: SingleRule，待迁移 -->
+        <!-- 数据集配置：已迁移 SingleRule（源/目标数据集 sourceDataSets/targetDataSets + 扩展参数 extendParams，原路径 modules/single/SingleRule） -->
         <ep-form-item
           v-if="state.form.regulatorSubType === 'SINGLE_DECISION' || state.form.regulatorSubType === 'SINGLE_RENDER'"
           label="数据集配置"
         >
-          <div class="sub-panel">
-            <span class="placeholder-tip">子组件 SingleRule（源/目标数据集 sourceDataSets/targetDataSets + 扩展参数 extendParams，原路径 modules/single/SingleRule），待迁移</span>
-          </div>
+          <SingleRule
+            v-model:source-data-sets-param="state.form.sourceDataSets"
+            v-model:target-data-sets-param="state.form.targetDataSets"
+            v-model:extend-params-ext="state.form.extendParams"
+          />
         </ep-form-item>
       </ep-form>
       <template #footer>
-        <span>
-          <!-- 原 handleCancel 会 $emit('ok') 强制刷新列表（防缓存脏数据），此处保持同行为 -->
-          <ep-button plain @click="handleCancel">关闭</ep-button>
-          <ep-button type="primary" @click="onClickSubmit">提交</ep-button>
-        </span>
+        <!-- 已迁移 SubmitFooterWithReq：requireCode 输入 + 取消/提交（事件接回原 handleCancel/onClickSubmit） -->
+        <SubmitFooterWithReq
+          ref="reqSelectRef"
+          :require-code-param="state.requireCodeParam"
+          @ok="onClickSubmit"
+          @cancel="handleCancel"
+        />
       </template>
     </ep-dialog>
 
@@ -335,15 +342,8 @@
       </div>
     </ep-dialog>
 
-    <!-- 待迁移功能 占位弹窗（数据比对；历史记录已改为真实跳转） -->
-    <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="480px">
-      <div class="placeholder-body">{{ state.placeholderText }}</div>
-      <template #footer>
-        <span>
-          <ep-button plain @click="state.placeholderVisible = false">关闭</ep-button>
-        </span>
-      </template>
-    </ep-dialog>
+    <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(row) 打开） -->
+    <DevelopProjectEnviSelectModal ref="enviSelectRef" />
   </div>
 </template>
 
@@ -360,7 +360,6 @@ import {
   getRegulatorRuleEdit,
   getRegulatorRuleDelete,
   getRegulatorRuleDeleteBatch,
-  getRegulatorRuleExportBatchSql,
   getRuleInfoByClassName,
   getAssociatedRules,
   getAssociatedFlowRules,
@@ -370,8 +369,23 @@ import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
 import JSelectService from '@/components/jSelectService/JSelectService.vue'
 import JSelectRegulatorInfo from '@/components/jSelectRegulatorInfo/JSelectRegulatorInfo.vue'
+// 已迁移组件：SubmitFooterWithReq 提交底栏（开发需求码） / DevelopProjectEnviSelectModal 比对数据环境选择
+import SubmitFooterWithReq from '@/components/submitFooterWithReq/SubmitFooterWithReq.vue'
+import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
+// 已迁移规则子组件（B 组，原 RegulatorRuleModal ./modules/* 七件套）
+import SingleRule from './modules/singleRule.vue'
+import GroupSet from './modules/groupSet.vue'
+import ChildRegulatorList from './modules/childRegulatorList.vue'
+import SubListRegulatorList from './modules/subListRegulatorList.vue'
+import DataAssign from './modules/dataAssign.vue'
+import DecisionRule from './modules/decisionRule.vue'
+import ValidateResult from './modules/validateResult.vue'
+import downFile from '@/utils/downFile'
 
 const formRef = ref(null)
+// SubmitFooterWithReq（读取 requireCode 作为 developRequire 提交参数）与比对环境选择弹窗
+const reqSelectRef = ref(null)
+const enviSelectRef = ref(null)
 const router = useRouter()
 
 // TODO: 联调后接入表字典 local|develop_system,system_name,system_code（应用系统下拉，联调前保持为空）
@@ -393,7 +407,9 @@ const subTypeOptions = [
 // 权限码（原 v-has）：新增 rule:add；批量删除/行删除 rule:delete；导出Sql rule:export；
 // 行编辑 rule:edit；历史记录 rule:history；数据比对 rule:compare；查看关联引用（无权限码）
 
-const form = {
+/** 表单数据对象工厂（与源 Modal 字段一一对应；子组件 B 组共用的 sourceDataSets/targetDataSets/extendParams/resultRule/groupSets/regulatorChilds/hasGroup
+ *  必须每次返回全新引用，避免 { ...form } 浅拷贝导致嵌套对象跨新增共享，与源差异：源为 data() 函数每次重建） */
+const makeForm = () => ({
   systemName: '',
   regulatorId: '',
   transCode: '',
@@ -403,8 +419,21 @@ const form = {
   asCommon: false,
   className: '',
   errorCode: '',
-  errorMessage: ''
-}
+  errorMessage: '',
+  // 源 model.hasGroup（GroupSet 是否分组）
+  hasGroup: false,
+  // 源/目标数据集（源 regulatorSources/regulatorTargets）
+  sourceDataSets: [],
+  targetDataSets: [],
+  // 处理参数（源 regulatorParam）
+  extendParams: [],
+  // 校验结果（源 resultRule）
+  resultRule: {},
+  // 分组行（源 groupSets）
+  groupSets: [],
+  // 子规则/赋值/条件行（源 regulatorChilds）
+  regulatorChilds: []
+})
 
 const state = reactive({
   // 查询（transCode 原由左侧 PayListDisplay .sync 注入并 watch 后 loadData(1)，本页无左侧导航，保留空参数）
@@ -526,7 +555,9 @@ const state = reactive({
   dialogVisible: false,
   title: '',
   id: '',
-  form: { ...form },
+  form: makeForm(),
+  // 开发需求码（原编辑回显 model.developRequire 传入 SubmitFooterWithReq.requireCodeParam）
+  requireCodeParam: '',
   // 删除
   dialogVisibleDel: false,
   deleteIds: [],
@@ -535,10 +566,7 @@ const state = reactive({
   refTitle: '',
   refType: 'rule',
   refData: [],
-  refRecord: null,
-  // 占位弹窗
-  placeholderVisible: false,
-  placeholderText: ''
+  refRecord: null
 })
 
 /** 获取列表数据 */
@@ -579,20 +607,50 @@ const onClearSelection = () => {
   state.buttonGroups[2].disabled = true
 }
 
-/** 规则子类型切换：清空 sourceDataSets/targetDataSets/resultRule/groupSets/regulatorChilds/errorInfo */
+/** 规则子类型切换（源 toggleType：清空 sourceDataSets/targetDataSets/resultRule/groupSets/regulatorChilds/errorInfo） */
 const onSubTypeChange = () => {
   state.form.className = ''
   state.form.errorCode = ''
   state.form.errorMessage = ''
+  state.form.sourceDataSets = []
+  state.form.targetDataSets = []
+  state.form.extendParams = []
+  state.form.resultRule = {}
+  state.form.groupSets = []
+  state.form.regulatorChilds = []
+  state.form.hasGroup = false
 }
 
-/** 类处理器联动（原 changeRuleInfo → /configuation/regulatorinfo/config/queryByClassName 初始化源/目标数据集与扩展参数） */
+/** 类处理器联动（源 changeRuleInfo → /configuation/regulatorinfo/config/queryByClassName 初始化源/目标数据集与扩展参数） */
 const onChangeRuleInfo = async () => {
-  await getRuleInfoByClassName({
+  const res = await getRuleInfoByClassName({
     systemName: state.form.systemName,
     className: state.form.className
   })
-  // mock 环境返回空数据集，暂无回填逻辑
+  // 按返回 sourceAcct/targetAcct 重建数据集、regulatorInfoParams 生成处理参数（与源一致；与源差异：省略 isLoad 编辑回显守卫与 ruleClassName 去重，mock 联调后自然替换）
+  if (res.success && res.result != null) {
+    const info = res.result
+    const sourceDataSets = []
+    for (let i = 0; i < (info.sourceAcct || 0); i++) {
+      sourceDataSets.push({ fieldIndex: i, fieldType: 'MSG', sourceType: 'SOURCE' })
+    }
+    const targetDataSets = []
+    for (let i = 0; i < (info.targetAcct || 0); i++) {
+      targetDataSets.push({ fieldIndex: i, fieldType: 'MSG', sourceType: 'TARGET' })
+    }
+    state.form.sourceDataSets = sourceDataSets
+    state.form.targetDataSets = targetDataSets
+    state.form.extendParams = (info.regulatorInfoParams || []).map((val) => ({
+      paramName: val.paramName,
+      fieldType: val.dataType,
+      defaultValue: val.paramDefaultValue || {}
+    }))
+  }
+}
+
+/** 源 setGroupSet：GroupSet 分组行深变更回调（行数据为共享引用，此处仅保留事件对齐） */
+const setGroupSet = (val) => {
+  state.form.groupSets = val
 }
 
 /** 清空数据（原 edit 回显 pick：systemName/regulatorName/transCode/regulatorId/regulatorSubType） */
@@ -606,15 +664,24 @@ const pickForm = (record) => ({
   asCommon: !!record.asCommon,
   className: record.className || '',
   errorCode: (record.errorInfo && record.errorInfo.errorCode) || '',
-  errorMessage: (record.errorInfo && record.errorInfo.errorMessage) || ''
+  errorMessage: (record.errorInfo && record.errorInfo.errorMessage) || '',
+  hasGroup: !!record.hasGroup,
+  // 源 edit 回显 300ms 延迟赋值：regulatorSources/regulatorTargets/regulatorParam/resultRule/groupSets/regulatorChilds
+  sourceDataSets: record.regulatorSources || [],
+  targetDataSets: record.regulatorTargets || [],
+  extendParams: record.regulatorParam || [],
+  resultRule: record.resultRule || {},
+  groupSets: record.groupSets || [],
+  regulatorChilds: record.regulatorChilds || []
 })
 
-/** 编辑（编辑态 readOnly=true：所属系统禁用） */
+/** 编辑（编辑态 readOnly=true：所属系统禁用；回显开发需求码给 SubmitFooterWithReq） */
 const handleEdit = (row) => {
   state.dialogVisible = true
   state.title = '业务规则配置页面编辑'
   state.id = row.id
   state.form = pickForm(row)
+  state.requireCodeParam = row.developRequire || ''
 }
 
 /** 新增（原 mixin handleAdd，title = description + "新增"，description=业务规则配置页面） */
@@ -622,7 +689,8 @@ const handleAdd = () => {
   state.dialogVisible = true
   state.title = '业务规则配置页面新增'
   state.id = ''
-  state.form = { ...form }
+  state.form = makeForm()
+  state.requireCodeParam = ''
 }
 
 /** 取消（原 handleCancel 会 $emit('ok') 强制刷新列表，防缓存脏数据） */
@@ -631,16 +699,27 @@ const handleCancel = () => {
   handleList()
 }
 
-/** 提交（原提交合并 regulatorParam/errorInfo/className/regulatorSources/regulatorTargets/resultRule/groupSets/asCommon/isParallelExecution/regulatorChilds，并附加 developRequire/developEnvi——依赖需求码组件与 vuex，未迁移） */
+/** 提交（原提交合并 regulatorParam/errorInfo/className/regulatorSources/regulatorTargets/resultRule/groupSets/asCommon/isParallelExecution/regulatorChilds；
+ *  developRequire 已接 SubmitFooterWithReq.requireCode；developEnvi 来自 vuex getter，子应用无该模块未迁移） */
 const onClickSubmit = debounce(async () => {
   const { isValid } = await formRef.value.validate()
   if (isValid) {
     const param = {
       ...state.form,
+      // 源 handleOk 提交字段映射：regulatorParam=处理参数(extendParams)、regulatorSources/regulatorTargets=源/目标数据集、
+      // resultRule/groupSets/regulatorChilds 原样提交（对象引用来自子组件双向回写）
+      regulatorParam: state.form.extendParams,
+      regulatorSources: state.form.sourceDataSets,
+      regulatorTargets: state.form.targetDataSets,
+      resultRule: state.form.resultRule,
+      groupSets: state.form.groupSets,
+      regulatorChilds: state.form.regulatorChilds,
       errorInfo: {
         errorCode: state.form.errorCode,
         errorMessage: state.form.errorMessage
-      }
+      },
+      // 原 formData.developRequire = this.$refs.reqSelect.requireCode（SubmitFooterWithReq 需求码）
+      developRequire: reqSelectRef.value?.requireCode || null
     }
     // 原 add 为 post /configuation/regulatorrule/config/add；edit 为 put /configuation/regulatorrule/config/edit
     let apiUrl = ''
@@ -694,13 +773,17 @@ const handleDelete = debounce(async () => {
   }
 })
 
-/** 导出Sql（原 mixin exportBatchSql → downFile(/configuation/regulatorrule/config/exportBatchSql, {ids, sqlType})，mock 环境仅调用占位） */
+/**
+ * 导出Sql（已迁移 downFile 下载封装：原 mixin exportBatchSql → downFile('/configuation/regulatorrule/config/exportBatchSql', {ids, sqlType})，
+ * 文件名默认 yyyyMMddHHmmss.sql；后端接口暂不通，失败时统一提示，联调后仅后端可用即真实下载）
+ */
 const onExportBatchSql = async () => {
   const ids = state.selectedRows.map((row) => row.id).join(',')
-  const res = await getRegulatorRuleExportBatchSql({ ids, sqlType: 'DML' })
-  if (res.returnCode === SUCCESS_STATUS) {
-    state.placeholderVisible = true
-    state.placeholderText = '原通过 downFile 下载 /configuation/regulatorrule/config/exportBatchSql（参数 ids、sqlType=DML），下载组件待迁移'
+  try {
+    // 真实接口：GET /configuation/regulatorrule/config/exportBatchSql（参数 ids、sqlType=DML）
+    await downFile('/configuation/regulatorrule/config/exportBatchSql', { ids, sqlType: 'DML' })
+  } catch (e) {
+    EPMessageTips('warning', '导出功能已迁移，接口待联调')
   }
 }
 
@@ -721,10 +804,9 @@ const onHistory = (row) => {
   router.push('/lowCodePlatform/dynamicHistory/list')
 }
 
-/** 数据比对（原组件: DevelopProjectEnviSelectModal，title=比对数据环境选择，待迁移） */
+/** 数据比对（已迁移 DevelopProjectEnviSelectModal：title=比对数据环境选择，原 ref.edit(record) 打开） */
 const onEnviSelect = (row) => {
-  state.placeholderVisible = true
-  state.placeholderText = '原组件 DevelopProjectEnviSelectModal（比对数据环境选择），待迁移'
+  enviSelectRef.value?.edit(row)
 }
 
 /** 查看关联引用（原 showRegulatorProcessModal 打开页内弹窗，title=规则标识+规则名称） */
@@ -814,19 +896,6 @@ onMounted(() => {
   gap: 8px;
   width: 100%;
 }
-.sub-panel {
-  width: 100%;
-  min-height: 60px;
-  border: 1px dashed #bfcae2;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-}
-.placeholder-tip {
-  color: #999;
-}
 .ref-body {
   max-height: 600px;
   overflow: auto;
@@ -840,9 +909,5 @@ onMounted(() => {
   color: #999;
   text-align: center;
   padding: 16px 0;
-}
-.placeholder-body {
-  color: #999;
-  padding: 12px 0;
 }
 </style>

@@ -90,10 +90,23 @@ export const getRegulatorRuleListColumns = (data) =>
 
 /**
  * 类处理器联动（/configuation/regulatorinfo/config/queryByClassName，参数 {systemName, className}）
- * 原实现：选择类处理器后调用该接口初始化源/目标数据集与扩展参数；mock 环境返回空，暂为 no-op
+ * 原实现：选择类处理器后调用该接口初始化源/目标数据集与扩展参数（RegulatorRuleModal.changeRuleInfo / SubListRegulatorList.changeRuleInfo）
+ * mock 返回 sourceAcct/targetAcct/regulatorInfoParams 示意结构（与后端 RegulatorInfo 一致），联调后替换为真实 Axios 调用
  */
 export const getRuleInfoByClassName = (data) =>
-  mockSimple({ success: true, result: { sourceDataSets: [], targetDataSets: [], extendParams: [] } })
+  mockSimple({
+    success: true,
+    result: {
+      className: data.className,
+      classPath: 'com.eigpay.regulator.' + (data.className || ''),
+      sourceAcct: 2,
+      targetAcct: 1,
+      regulatorInfoParams: [
+        { paramName: 'param1', dataType: 'FIXED', paramDefaultValue: { value: '' } },
+        { paramName: 'param2', dataType: 'DICT', paramDefaultValue: { value: '' } }
+      ]
+    }
+  })
 
 /** 规则引用（/related/process/queryAssociatedRules，参数 {pkValue}；mock 返回空列表，无假数据） */
 export const getAssociatedRules = (data) => mockSimple({ success: true, result: [] })

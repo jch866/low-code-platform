@@ -84,7 +84,7 @@
       </template>
     </TableBlock>
 
-    <!-- 新增编辑 弹窗（原 a-modal width=1200，footer 原为 SubmitFooterWithReq 带开发需求码，待迁移） -->
+    <!-- 新增编辑 弹窗（原 a-modal width=1200，footer 已迁移 SubmitFooterWithReq 带开发需求码） -->
     <ep-dialog
       v-model="state.dialogVisible"
       :title="state.title"
@@ -176,22 +176,25 @@
             />
           </ep-select>
         </ep-form-item>
-        <!-- 脚本内容：仅 GROOVY 时显示；原组件: JCodeEditor, language=Java, lineNumbers, fullScreen，待迁移，暂用等宽 textarea 占位 -->
+        <!-- 脚本内容：仅 GROOVY 时显示；已迁移 JCodeEditor（原 language=Java, lineNumbers, fullScreen） -->
         <ep-form-item v-show="state.form.scriptType === 'GROOVY'" prop="scriptContent" label="脚本内容">
-          <ep-input
+          <JCodeEditor
             v-model="state.form.scriptContent"
-            type="textarea"
-            :rows="12"
-            class="code-textarea"
+            language="Java"
+            :line-numbers="true"
+            :full-screen="true"
             placeholder="请输入脚本内容"
           />
         </ep-form-item>
       </ep-form>
       <template #footer>
-        <span>
-          <ep-button plain @click="onClickClear">关闭</ep-button>
-          <ep-button type="primary" @click="onClickSubmit">提交</ep-button>
-        </span>
+        <!-- 已迁移 SubmitFooterWithReq：requireCode 输入 + 取消/提交（事件接回原 onClickClear/onClickSubmit） -->
+        <SubmitFooterWithReq
+          ref="reqSelectRef"
+          :require-code-param="state.requireCodeParam"
+          @ok="onClickSubmit"
+          @cancel="onClickClear"
+        />
       </template>
     </ep-dialog>
 
@@ -210,7 +213,7 @@
       </template>
     </ep-dialog>
 
-    <!-- 待迁移功能 占位弹窗（数据比对/查看关联引用；历史记录已改为真实跳转） -->
+    <!-- 待迁移功能 占位弹窗（查看关联引用；数据比对已迁移 DevelopProjectEnviSelectModal，历史记录已改为真实跳转） -->
     <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="480px">
       <div class="placeholder-body">{{ state.placeholderText }}</div>
       <template #footer>
@@ -219,6 +222,9 @@
         </span>
       </template>
     </ep-dialog>
+
+    <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(row) 打开） -->
+    <DevelopProjectEnviSelectModal ref="enviSelectRef" />
   </div>
 </template>
 
@@ -234,13 +240,20 @@ import {
   getRegulatorInfoAdd,
   getRegulatorInfoEdit,
   getRegulatorInfoDelete,
-  getRegulatorInfoDeleteBatch,
-  getRegulatorInfoExportBatchSql
+  getRegulatorInfoDeleteBatch
 } from '@/api/lowCodePlatform/regulatorInfo'
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
+// 已迁移组件：JCodeEditor 轻量脚本编辑器 / SubmitFooterWithReq 提交底栏（开发需求码） / DevelopProjectEnviSelectModal 比对数据环境选择
+import JCodeEditor from '@/components/jCodeEditor/JCodeEditor.vue'
+import SubmitFooterWithReq from '@/components/submitFooterWithReq/SubmitFooterWithReq.vue'
+import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
+import downFile from '@/utils/downFile'
 
 const formRef = ref(null)
+// SubmitFooterWithReq（读取 requireCode 作为 developRequire 提交参数）与比对环境选择弹窗
+const reqSelectRef = ref(null)
+const enviSelectRef = ref(null)
 const router = useRouter()
 
 // TODO: 联调后接入表字典 local|develop_system,system_name,system_code（所属系统下拉，联调前保持为空）
@@ -372,6 +385,8 @@ const state = reactive({
   title: '',
   id: '',
   form: { ...form },
+  // 开发需求码（原编辑回显 model.developRequire 传入 SubmitFooterWithReq.requireCodeParam）
+  requireCodeParam: '',
   // 扩展参数动态行（regulatorInfoParams）
   regulatorInfoParams: [],
   // 删除
@@ -432,12 +447,13 @@ const pickForm = (record) => ({
   targetAcct: record.targetAcct || '1'
 })
 
-/** 编辑 */
+/** 编辑（回显开发需求码给 SubmitFooterWithReq，原 $refs.reqSelect.requireCode=record.developRequire） */
 const handleEdit = (row) => {
   state.dialogVisible = true
   state.title = '规则处理器配置页面编辑'
   state.id = row.id
   state.form = pickForm(row)
+  state.requireCodeParam = row.developRequire || ''
   state.regulatorInfoParams = []
 }
 
@@ -447,6 +463,7 @@ const handleAdd = () => {
   state.title = '规则处理器配置页面新增'
   state.id = ''
   state.form = { ...form }
+  state.requireCodeParam = ''
   state.regulatorInfoParams = []
 }
 
@@ -475,13 +492,16 @@ const onClickClear = () => {
   state.dialogVisible = false
 }
 
-/** 提交（原提交合并 formData.regulatorInfoParams/scriptContent，并附加 developRequire/developEnvi——依赖需求码组件与 vuex，未迁移） */
+/** 提交（原提交合并 formData.regulatorInfoParams/scriptContent + developRequire/developEnvi；
+ *  developRequire 已接 SubmitFooterWithReq.requireCode；developEnvi 来自 vuex getter，子应用无该模块未迁移） */
 const onClickSubmit = debounce(async () => {
   const { isValid } = await formRef.value.validate()
   if (isValid) {
     const param = {
       ...state.form,
-      regulatorInfoParams: state.regulatorInfoParams
+      regulatorInfoParams: state.regulatorInfoParams,
+      // 原 formData.developRequire = this.$refs.reqSelect.requireCode（SubmitFooterWithReq 需求码）
+      developRequire: reqSelectRef.value?.requireCode || null
     }
     // 原 add 为 post /configuation/regulatorinfo/config/add；edit 为 put /configuation/regulatorinfo/config/edit
     let apiUrl = ''
@@ -535,13 +555,17 @@ const handleDelete = debounce(async () => {
   }
 })
 
-/** 导出Sql（原 mixin exportBatchSql → downFile(/configuation/regulatorinfo/config/exportBatchSql, {ids, sqlType})，mock 环境仅调用占位） */
+/**
+ * 导出Sql（已迁移 downFile 下载封装：原 mixin exportBatchSql → downFile('/configuation/regulatorinfo/config/exportBatchSql', {ids, sqlType})，
+ * 文件名默认 yyyyMMddHHmmss.sql；后端接口暂不通，失败时统一提示，联调后仅后端可用即真实下载）
+ */
 const onExportBatchSql = async () => {
   const ids = state.selectedRows.map((row) => row.id).join(',')
-  const res = await getRegulatorInfoExportBatchSql({ ids, sqlType: 'DML' })
-  if (res.returnCode === SUCCESS_STATUS) {
-    state.placeholderVisible = true
-    state.placeholderText = '原通过 downFile 下载 /configuation/regulatorinfo/config/exportBatchSql（参数 ids、sqlType=DML），下载组件待迁移'
+  try {
+    // 真实接口：GET /configuation/regulatorinfo/config/exportBatchSql（参数 ids、sqlType=DML）
+    await downFile('/configuation/regulatorinfo/config/exportBatchSql', { ids, sqlType: 'DML' })
+  } catch (e) {
+    EPMessageTips('warning', '导出功能已迁移，接口待联调')
   }
 }
 
@@ -562,10 +586,9 @@ const onHistory = (row) => {
   router.push('/lowCodePlatform/dynamicHistory/list')
 }
 
-/** 数据比对（原组件: DevelopProjectEnviSelectModal，title=比对数据环境选择，待迁移） */
+/** 数据比对（已迁移 DevelopProjectEnviSelectModal：title=比对数据环境选择，原 ref.edit(record) 打开） */
 const onEnviSelect = (row) => {
-  state.placeholderVisible = true
-  state.placeholderText = '原组件 DevelopProjectEnviSelectModal（比对数据环境选择），待迁移'
+  enviSelectRef.value?.edit(row)
 }
 
 /** 查看关联引用（原 handRegulatorProcess → vuex parentProcessData=true 显示 ParentProcessRuleInfoList，待迁移） */
@@ -630,9 +653,6 @@ onMounted(() => {
 .param-empty {
   color: #999;
   margin-bottom: 8px;
-}
-.code-textarea :deep(textarea) {
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 .placeholder-body {
   color: #999;

@@ -100,7 +100,7 @@
     </TableBlock>
 
     <!-- 新增编辑 抽屉（原 a-drawer placement=right，drawerWidth=700；@eigpay/components 未提供抽屉组件，以固定定位面板模拟；
-         footer 原为 SubmitFooterWithReq 带开发需求码，待迁移） -->
+         footer 已迁移 SubmitFooterWithReq 带开发需求码） -->
     <div v-if="state.drawerVisible" class="drawer-mask" @click.self="handleCancel">
       <div class="drawer-panel" :style="{ width: '700px' }">
         <div class="drawer-header">
@@ -199,9 +199,13 @@
           </ep-form>
         </div>
         <div class="drawer-footer">
-          <!-- 原组件: SubmitFooterWithReq（带开发需求码 requireCode），待迁移 -->
-          <ep-button plain @click="handleCancel">关闭</ep-button>
-          <ep-button type="primary" @click="onClickSubmit">提交</ep-button>
+          <!-- 已迁移 SubmitFooterWithReq：requireCode 输入 + 取消/提交（事件接回原 handleCancel/onClickSubmit） -->
+          <SubmitFooterWithReq
+            ref="reqSelectRef"
+            :require-code-param="state.requireCodeParam"
+            @ok="onClickSubmit"
+            @cancel="handleCancel"
+          />
         </div>
       </div>
     </div>
@@ -244,7 +248,7 @@
       </template>
     </ep-dialog>
 
-    <!-- 待迁移功能 占位弹窗（导出SQL/数据比对/查看关联流程；历史记录已改为真实跳转） -->
+    <!-- 待迁移功能 占位弹窗（查看关联流程；导出SQL/数据比对已迁移，历史记录已改为真实跳转） -->
     <ep-dialog v-model="state.placeholderVisible" title="待迁移功能" width="480px">
       <div class="placeholder-body">{{ state.placeholderText }}</div>
       <template #footer>
@@ -253,6 +257,9 @@
         </span>
       </template>
     </ep-dialog>
+
+    <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(row) 打开） -->
+    <DevelopProjectEnviSelectModal ref="enviSelectRef" />
   </div>
 </template>
 
@@ -343,7 +350,6 @@ import {
   getFlowAdd,
   getFlowEdit,
   getFlowDeleteFlow,
-  getFlowExportBatchSql,
   getFlowDuplicateCheck
 } from '@/api/lowCodePlatform/flowManage'
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
@@ -351,8 +357,15 @@ import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
 import FlowDesigner from '@/components/flowDesigner/FlowDesigner.vue'
 import JSelectService from '@/components/jSelectService/JSelectService.vue'
 import JSelectFlow from '@/components/jSelectFlow/JSelectFlow.vue'
+// 已迁移组件：SubmitFooterWithReq 提交底栏（开发需求码） / DevelopProjectEnviSelectModal 比对数据环境选择
+import SubmitFooterWithReq from '@/components/submitFooterWithReq/SubmitFooterWithReq.vue'
+import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
+import downFile, { formatDate } from '@/utils/downFile'
 
 const formRef = ref(null)
+// SubmitFooterWithReq（读取 requireCode 作为 developRequire 提交参数）与比对环境选择弹窗
+const reqSelectRef = ref(null)
+const enviSelectRef = ref(null)
 const router = useRouter()
 
 // TODO: 联调后接入表字典 local|develop_system,system_name,system_code（所属系统下拉/单选，联调前保持为空）
@@ -492,6 +505,8 @@ const state = reactive({
   title: '',
   id: '',
   form: { ...form },
+  // 开发需求码（原编辑回显 model.developRequire 传入 SubmitFooterWithReq.requireCodeParam）
+  requireCodeParam: '',
   // 删除确认
   dialogVisibleDel: false,
   // 流程设计器（保留原集成：编辑/只读浏览共用一个弹窗，以 flowViewOnly 区分）
@@ -540,6 +555,7 @@ const handleAdd = () => {
   state.title = '流程新增'
   state.id = ''
   state.form = { ...form }
+  state.requireCodeParam = ''
 }
 
 /** 编辑（原覆写 handleEdit，title="{流程}{编辑}"→"流程编辑"；编辑态所属系统禁用、流程编码只读） */
@@ -561,6 +577,8 @@ const handleEdit = (row) => {
     parentFlowId: row.parentFlowId || '',
     epfFlowRemarks: row.epfFlowRemarks || ''
   }
+  // 回显开发需求码给 SubmitFooterWithReq（原 $refs.reqSelect.requireCode=record.developRequire）
+  state.requireCodeParam = row.developRequire || ''
 }
 
 /** 取消（关闭抽屉） */
@@ -579,7 +597,8 @@ const checkDuplicate = async (fieldName, fieldVal, label) => {
   return true
 }
 
-/** 提交（原提交 Object.assign(model, values) + developRequire/developEnvi——需求码组件未迁移） */
+/** 提交（原提交 Object.assign(model, values) + developRequire/developEnvi；
+ *  developRequire 已接 SubmitFooterWithReq.requireCode；developEnvi 来自 vuex getter，子应用无该模块未迁移） */
 const onClickSubmit = debounce(async () => {
   const { isValid } = await formRef.value.validate()
   if (!isValid) return
@@ -587,7 +606,11 @@ const onClickSubmit = debounce(async () => {
   if (!passCode) return
   const passName = await checkDuplicate('epf_flow_name', state.form.epfFlowName, '流程名称')
   if (!passName) return
-  const param = { ...state.form }
+  const param = {
+    ...state.form,
+    // 原 formData.developRequire = this.$refs.reqSelect.requireCode（SubmitFooterWithReq 需求码）
+    developRequire: reqSelectRef.value?.requireCode || null
+  }
   // 原 add 为 postAction("/flow/manage/config/add")；edit 为 putAction("/flow/manage/config/edit")
   let apiUrl = ''
   if (state.id) {
@@ -613,12 +636,20 @@ const onDeleteFlow = async (row) => {
   }
 }
 
-/** 导出SQL（原 downFile('/flow/manage/config/exportBatchSql', {ids: record.id})，文件名=流程名称+（流程编码）+日期+'.sql' 全角括号，待迁移） */
+/**
+ * 导出SQL（已迁移 downFile 下载封装：原 downFile('/flow/manage/config/exportBatchSql', {ids: record.id})，
+ * 文件名=流程名称+（流程编码）+日期+'.sql' 全角括号；后端接口暂不通，失败时统一提示，联调后仅后端可用即真实下载）
+ */
 const onExportSql = async (row) => {
-  const res = await getFlowExportBatchSql({ ids: row.id })
-  if (res.returnCode === SUCCESS_STATUS) {
-    state.placeholderVisible = true
-    state.placeholderText = '原通过 downFile 下载 /flow/manage/config/exportBatchSql（参数 ids=record.id），文件名含全角括号，下载组件待迁移'
+  try {
+    // 真实接口：GET /flow/manage/config/exportBatchSql（参数 ids=record.id）
+    await downFile(
+      '/flow/manage/config/exportBatchSql',
+      { ids: row.id },
+      `${row.epfFlowName}（${row.epfFlowCode}）${formatDate(new Date())}.sql`
+    )
+  } catch (e) {
+    EPMessageTips('warning', '导出功能已迁移，接口待联调')
   }
 }
 
@@ -644,10 +675,9 @@ const onHistory = (row) => {
   router.push('/lowCodePlatform/dynamicHistory/list')
 }
 
-/** 数据比对（原组件: DevelopProjectEnviSelectModal，title=比对数据环境选择，待迁移） */
+/** 数据比对（已迁移 DevelopProjectEnviSelectModal：title=比对数据环境选择，原 ref.edit(record) 打开） */
 const onEnviSelect = (row) => {
-  state.placeholderVisible = true
-  state.placeholderText = '原组件 DevelopProjectEnviSelectModal（比对数据环境选择），待迁移'
+  enviSelectRef.value?.edit(row)
 }
 
 /** 查看关联流程（原 handProcess → vuex parentProcessData=true 显示 ParentProcess 组件 toPkValue，待迁移） */

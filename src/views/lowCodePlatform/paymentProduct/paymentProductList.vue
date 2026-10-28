@@ -103,14 +103,14 @@
           </ep-select>
         </ep-form-item>
         <ep-form-item prop="applicationIcon" label="应用图标">
-          <!-- 原组件: Icons 图标选择弹窗（addonAfter setting 图标按钮），待迁移；按钮暂置灰 -->
+          <!-- 已迁移 Icons 图标选择弹窗（原 addonAfter setting 图标按钮；点按钮开弹窗、选中回写 applicationIcon、关闭回调） -->
           <div class="icon-input">
             <ep-input
               v-model="state.form.applicationIcon"
               placeholder="请输入应用图标"
               type="text"
             />
-            <ep-button plain disabled>设置图标</ep-button>
+            <ep-button plain type="primary" @click="onOpenIconSelect">设置图标</ep-button>
           </div>
         </ep-form-item>
         <ep-form-item
@@ -245,6 +245,12 @@
         </span>
       </template>
     </ep-dialog>
+    <!-- 已迁移 Icons 图标选择弹窗（应用图标选择入口，选中回写 model.applicationIcon） -->
+    <Icons
+      :icon-choose-visible="state.iconChooseVisible"
+      @choose="onIconChoose"
+      @close="state.iconChooseVisible = false"
+    />
   </div>
 </template>
 
@@ -265,6 +271,8 @@ import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
 import ApplicationAdd from './applicationAdd.vue'
 // 按部门选项目（原 develop/components/biz/JSelectProjectByDep，v-model 为逗号拼接的 projectCode）
 import JSelectProjectByDep from '@/components/jSelectProjectByDep/JSelectProjectByDep.vue'
+// 已迁移组件：Icons 图标选择弹窗（应用图标字段选择）
+import Icons from '@/components/icons/Icons.vue'
 
 const formRef = ref(null)
 const sceneFormRef = ref(null)
@@ -380,6 +388,8 @@ const state = reactive({
   title: '',
   id: '',
   form: { ...form },
+  // 图标选择弹窗显隐（已迁移 Icons）
+  iconChooseVisible: false,
   // 场景列表（原 add.vue 内嵌场景表格，确认后写入 sceneList）
   sceneList: [],
   // 场景弹窗（原 sceneAdd.vue 抽屉）
@@ -412,7 +422,17 @@ const clearDate = () => {
   formRef.value && formRef.value.resetFields()
 }
 
-/** 新增（原弹窗标题=「应用管理新增」，点击同时路由跳转 /system/edit，此处省略跳转） */
+/** 打开图标选择弹窗（已迁移 Icons，原 addonAfter「设置图标」按钮） */
+const onOpenIconSelect = () => {
+  state.iconChooseVisible = true
+}
+
+/** 图标选中回调（原 @choose → model.applicationIcon = 图标类名；与源差异：值为 ep-i-* 图标类名而非 antd 图标名） */
+const onIconChoose = (icon) => {
+  state.form.applicationIcon = icon
+  state.iconChooseVisible = false
+}
+
 const handleAdd = () => {
   clearDate()
   state.dialogVisible = true

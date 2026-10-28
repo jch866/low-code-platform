@@ -86,23 +86,19 @@
       </template>
     </ep-dialog>
 
-    <!-- 原组件: IssueJobsProcessDetailDisplay，待迁移（历史数据对比占位弹窗） -->
-    <ep-dialog v-model="state.diffVisible" title="历史数据对比" width="480px">
-      <div class="placeholder-block">原比对组件 IssueJobsProcessDetailDisplay 待迁移，当前仅保留数据比对入口</div>
-      <template #footer>
-        <span class="dialog-footer">
-          <ep-button plain @click="state.diffVisible = false">关闭</ep-button>
-        </span>
-      </template>
-    </ep-dialog>
+    <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(record) 打开；
+         确定后暂提示「比对结果展示组件待迁移」，原展示组件 IssueJobsProcessDetailDisplay 属 B 组未迁移） -->
+    <DevelopProjectEnviSelectModal ref="enviSelectRef" />
   </div>
 </template>
 
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
+// 已迁移组件：DevelopProjectEnviSelectModal 比对数据环境选择（历史数据比对入口）
+import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
 import { SUCCESS_STATUS, PAGE_SIZE, PAGE_NO } from '@/config/config'
 import { EPMessageTips } from '@/utils/utils'
 import { getDynamicHistoryList, getDynamicHistoryListColumns } from '@/api/lowCodePlatform/dynamicHistory'
@@ -111,6 +107,8 @@ import { getDynamicHistoryList, getDynamicHistoryListColumns } from '@/api/lowCo
 const HISTORY_PARAMS_KEY = 'lowCode:dynamicHistoryParams'
 
 const route = useRoute()
+// 比对数据环境选择弹窗（DevelopProjectEnviSelectModal 实例）
+const enviSelectRef = ref(null)
 
 // 原页面 defaultIfNull：空值统一展示 '-'
 const defaultIfNull = (val) => (!val ? '-' : val)
@@ -154,9 +152,7 @@ const state = reactive({
     pageSize: PAGE_SIZE
   },
   // 明细详情弹窗
-  detailVisible: false,
-  // 数据比对占位弹窗
-  diffVisible: false
+  detailVisible: false
 })
 
 /** 页面挂载：读取传参并初始化（每次进入覆盖读取 sessionStorage） */
@@ -310,22 +306,27 @@ const onSelectedDiff = () => {
     EPMessageTips('warning', '对比的数据暂时只支持2条')
     return
   }
-  // 原逻辑：两条选中行置 developMode='HISTORY' 后调用 handleDiff(rows[0], rows[1], false)
-  openDiffPlaceholder()
+  // 原逻辑：两条选中行置 developMode='HISTORY' 后调用 handleDiff(rows[0], rows[1], false)；
+  // 与源差异：比对结果展示组件 IssueJobsProcessDetailDisplay 属 B 组未迁移，
+  // 统一走环境选择入口（取第一条选中行作为比对源记录）
+  openEnviSelect(state.selectedRows[0])
 }
 
 /**
  * 数据比对（原 handleDiff：组装 changeJobProjectCode/changeSheetJobReferContentObject/
  * changeSheetJobContentObject 后打开 IssueJobsProcessDetailDisplay 弹窗，
- * isRecover=true 时 diffType='history'）——比对组件待迁移，保留入口与弹窗占位
+ * isRecover=true 时 diffType='history'）
+ * 已迁移 DevelopProjectEnviSelectModal：以 sourceRecord 为比对源记录打开环境选择，
+ * 确定后由组件调 GET /dynamic/table/data/fetchByIdWithEnvi 取目标环境数据，
+ * 暂提示「比对结果展示组件待迁移」（展示组件属 B 组未迁移，参数组装逻辑已在组件内保留）
  */
 const handleDiff = (sourceRecord, targetRecord, isRecover) => {
-  openDiffPlaceholder(isRecover)
+  openEnviSelect(sourceRecord)
 }
 
-/** 打开数据比对占位弹窗 */
-const openDiffPlaceholder = () => {
-  state.diffVisible = true
+/** 打开比对数据环境选择弹窗（记录需含 id/tableName，历史行缺失时以页面级 tableName 兜底） */
+const openEnviSelect = (record) => {
+  enviSelectRef.value?.edit({ ...record, tableName: record.tableName || state.tableName })
 }
 
 /** 查看详情（原 handleDetail：detailForm.edit(record, formItem)，title=LC0784 明细详情） */
@@ -403,14 +404,6 @@ const handleCurrentChange = (val) => {
 }
 .tip-count {
   font-weight: 600;
-}
-.placeholder-block {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  color: #999;
-  background: #f7f9fd;
 }
 .button-text {
   padding: 0;
