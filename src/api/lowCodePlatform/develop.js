@@ -159,11 +159,50 @@ export function getDevelopAllEnvis() {
 
 /**
  * 按目标环境取记录详情（原 GET /dynamic/table/data/fetchByIdWithEnvi，参数 {id, envi}，
- * 返回目标环境记录（含 dataValueObject）或 null，供跨环境数据比对）
+ * 返回目标环境记录（含 dataValueObject）或 null（目标环境无该数据时），供跨环境数据比对）
+ * mock 固定返回一条带 dataValueObject 的记录便于演示跨环境比对差异（返回 null 时展示「原始数据-无」分支），
+ * 动态字段与 dynamicHistory.js 的 allColumnsItems 对齐，联调时替换
  */
-const mockGetDynamicTableFetchByIdWithEnviImpl = () => mockSimple({ result: null })
+const mockGetDynamicTableFetchByIdWithEnviImpl = (data) =>
+  mockSimple({
+    result: {
+      pkValue: data?.id ?? '1',
+      dataValueObject: {
+        id: data?.id ?? '1',
+        trans_id: 'TR202610120001',
+        trans_amount: '1200.00',
+        trans_status: '成功',
+        remark: '目标环境当前数据'
+      }
+    }
+  })
 /** 网关元信息：operationType=''（待后端提供服务码）| 直连: GET /dynamic/table/data/fetchByIdWithEnvi */
 const META_getDynamicTableFetchByIdWithEnvi = { operationType: '', url: '/dynamic/table/data/fetchByIdWithEnvi', method: 'GET' }
-export function getDynamicTableFetchByIdWithEnvi() {
-  return gatewayOrMock(META_getDynamicTableFetchByIdWithEnvi, mockGetDynamicTableFetchByIdWithEnviImpl)
+export function getDynamicTableFetchByIdWithEnvi(data) {
+  return gatewayOrMock(META_getDynamicTableFetchByIdWithEnvi, mockGetDynamicTableFetchByIdWithEnviImpl, data)
+}
+
+/**
+ * 数据发布/同步/恢复（迁移自 IssueJobsProcessDetailDisplay 底部操作，原均 PUT，body：
+ * { sourceEnvi, targetEnvi, sourceTableData, targetTableData }，同步接口两侧互换）
+ */
+const mockHandleDynamicTableDataPublishImpl = () => mockSimple({ result: null, returnMsg: '发布成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /dynamic/table/data/handlePublish */
+const META_handleDynamicTableDataPublish = { operationType: '', url: '/dynamic/table/data/handlePublish', method: 'PUT' }
+export function handleDynamicTableDataPublish(data) {
+  return gatewayOrMock(META_handleDynamicTableDataPublish, mockHandleDynamicTableDataPublishImpl, data)
+}
+
+const mockHandleDynamicTableDataSyncImpl = () => mockSimple({ result: null, returnMsg: '同步成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /dynamic/table/data/handleSync */
+const META_handleDynamicTableDataSync = { operationType: '', url: '/dynamic/table/data/handleSync', method: 'PUT' }
+export function handleDynamicTableDataSync(data) {
+  return gatewayOrMock(META_handleDynamicTableDataSync, mockHandleDynamicTableDataSyncImpl, data)
+}
+
+const mockHandleDynamicTableDataRecoverImpl = () => mockSimple({ result: null, returnMsg: '恢复成功' })
+/** 网关元信息：operationType=''（待后端提供服务码）| 直连: PUT /dynamic/table/data/handleRecover */
+const META_handleDynamicTableDataRecover = { operationType: '', url: '/dynamic/table/data/handleRecover', method: 'PUT' }
+export function handleDynamicTableDataRecover(data) {
+  return gatewayOrMock(META_handleDynamicTableDataRecover, mockHandleDynamicTableDataRecoverImpl, data)
 }

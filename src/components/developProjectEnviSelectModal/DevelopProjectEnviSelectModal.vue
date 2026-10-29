@@ -23,8 +23,6 @@
       </ep-radio-group>
       <div v-if="!envis.length && !confirmLoading" class="envi-empty">暂无可选比对环境</div>
     </div>
-    <!-- 原 IssueJobsProcessDetailDisplay（比对结果展示，ref=modalForm）属 B 组组件未迁移，
-         确定后暂以 EPMessageTips 提示替代，见 handleCheck 注释 -->
     <template #footer>
       <span>
         <ep-button plain @click="handleCancel">关闭</ep-button>
@@ -32,13 +30,17 @@
       </span>
     </template>
   </ep-dialog>
+  <!-- 已迁移：IssueJobsProcessDetailDisplay 比对结果展示（源即嵌在本弹窗内 ref=modalForm，
+       确定后组装比对参数并直接打开；本弹窗保持打开，关闭比对结果后回到环境选择，与源一致） -->
+  <IssueJobsProcessDetailDisplay ref="displayRef" />
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { SUCCESS_STATUS } from '@/config/config'
-import { EPMessageTips } from '@/utils/utils'
 import { getDevelopAllEnvis, getDynamicTableFetchByIdWithEnvi } from '@/api/lowCodePlatform/develop'
+// 已迁移组件：IssueJobsProcessDetailDisplay 比对结果展示（确定后由本组件组装参数直接打开）
+import IssueJobsProcessDetailDisplay from '@/components/issueJobsProcessDetailDisplay/IssueJobsProcessDetailDisplay.vue'
 
 const emit = defineEmits(['close'])
 
@@ -51,6 +53,8 @@ const model = ref({})
 const envis = ref([])
 // 选中的目标环境编码（原 value）
 const value = ref('')
+// 比对结果展示弹窗（IssueJobsProcessDetailDisplay 实例，原 ref=modalForm）
+const displayRef = ref(null)
 
 // 原 url 配置：
 // list:   GET /develop/environment/getAllEnvis            （查询全部比对环境）
@@ -107,15 +111,15 @@ const handleCancel = () => {
 }
 
 /**
- * 组装比对参数（原 handleCheck 逻辑照搬）：
+ * 组装比对参数并打开比对结果展示（原 handleCheck 逻辑照搬）：
  * obj = {
  *   changeJobProjectCode: 源记录表名(model.tableName)
  *   changeSheetJobReferContentObject: 源记录（pkValue 缺省取 id）
  *   changeSheetJobContentObject: 目标环境记录（pkValue 取 dataValueObject.id；无目标数据时置空结构）
  * }
- * 与源差异：原随后打开 IssueJobsProcessDetailDisplay（edit(obj)、diffType='cross'、
- * title=LC0742「跨环境数据对比」），该展示组件属 B 组未迁移，
- * 此处暂以提示告知，obj 组装逻辑与真实接口保留，待 B 组迁移后接回展示组件
+ * 随后打开 IssueJobsProcessDetailDisplay（原 ref 逐属性赋值改为一参传入 edit）：
+ * srcPk='pkValue'、tarPk='pkValue'、targetEvni=targetEnvi、diffType='cross'、title=LC0742「跨环境数据对比」；
+ * 本弹窗保持打开（源行为），关闭比对结果后回到环境选择
  */
 const handleCheck = (targetEnvi, sourceRecord, targetRecord) => {
   const obj = {
@@ -133,10 +137,13 @@ const handleCheck = (targetEnvi, sourceRecord, targetRecord) => {
   } else {
     obj.changeSheetJobContentObject.pkValue = ''
   }
-  // 原逻辑（B 组展示组件迁移后接回）：modalForm.srcPk='pkValue'、tarPk='pkValue'、
-  // targetEvni=targetEnvi、diffType='cross'、edit(obj)、title=LC0742「跨环境数据对比」
-  EPMessageTips('warning', '比对结果展示组件待迁移')
-  close()
+  displayRef.value?.edit(obj, {
+    srcPk: 'pkValue',
+    tarPk: 'pkValue',
+    targetEvni: targetEnvi,
+    diffType: 'cross',
+    title: '跨环境数据对比' // 原 LC0742
+  })
 }
 
 defineExpose({

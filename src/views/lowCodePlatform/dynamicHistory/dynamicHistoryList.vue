@@ -86,9 +86,9 @@
       </template>
     </ep-dialog>
 
-    <!-- 已迁移：DevelopProjectEnviSelectModal 比对数据环境选择（数据比对入口，ref.edit(record) 打开；
-         确定后暂提示「比对结果展示组件待迁移」，原展示组件 IssueJobsProcessDetailDisplay 属 B 组未迁移） -->
-    <DevelopProjectEnviSelectModal ref="enviSelectRef" />
+    <!-- 已迁移：IssueJobsProcessDetailDisplay 数据比对结果展示（原 handleDiff 直接 edit(obj) 打开，不经环境选择弹窗；
+         行级比对 diffType='history'（底部多「恢复」），勾选 2 条比对 diffType=''（仅 取消/确认）） -->
+    <IssueJobsProcessDetailDisplay ref="displayRef" />
   </div>
 </template>
 
@@ -97,8 +97,8 @@ import { reactive, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import TableBlock from '@/components/tableBlock/tableBlock.vue'
 import OperationCloumn from '@/components/tableBlock/operationColumn.vue'
-// 已迁移组件：DevelopProjectEnviSelectModal 比对数据环境选择（历史数据比对入口）
-import DevelopProjectEnviSelectModal from '@/components/developProjectEnviSelectModal/DevelopProjectEnviSelectModal.vue'
+// 已迁移组件：IssueJobsProcessDetailDisplay 数据比对结果展示（历史数据比对，原直开展示组件）
+import IssueJobsProcessDetailDisplay from '@/components/issueJobsProcessDetailDisplay/IssueJobsProcessDetailDisplay.vue'
 import { SUCCESS_STATUS, PAGE_SIZE, PAGE_NO } from '@/config/config'
 import { EPMessageTips } from '@/utils/utils'
 import { getDynamicHistoryList, getDynamicHistoryListColumns } from '@/api/lowCodePlatform/dynamicHistory'
@@ -107,8 +107,8 @@ import { getDynamicHistoryList, getDynamicHistoryListColumns } from '@/api/lowCo
 const HISTORY_PARAMS_KEY = 'lowCode:dynamicHistoryParams'
 
 const route = useRoute()
-// 比对数据环境选择弹窗（DevelopProjectEnviSelectModal 实例）
-const enviSelectRef = ref(null)
+// 数据比对结果展示弹窗（IssueJobsProcessDetailDisplay 实例）
+const displayRef = ref(null)
 
 // 原页面 defaultIfNull：空值统一展示 '-'
 const defaultIfNull = (val) => (!val ? '-' : val)
@@ -306,27 +306,43 @@ const onSelectedDiff = () => {
     EPMessageTips('warning', '对比的数据暂时只支持2条')
     return
   }
-  // 原逻辑：两条选中行置 developMode='HISTORY' 后调用 handleDiff(rows[0], rows[1], false)；
-  // 与源差异：比对结果展示组件 IssueJobsProcessDetailDisplay 属 B 组未迁移，
-  // 统一走环境选择入口（取第一条选中行作为比对源记录）
-  openEnviSelect(state.selectedRows[0])
+  // 原逻辑：两条选中行置 developMode='HISTORY' 后调用 handleDiff(rows[0], rows[1], false)
+  // （与源差异：源在条数不符时仅提示未 return，继续执行会空引用，此处补 return 兜底）
+  state.selectedRows[0].developMode = 'HISTORY'
+  state.selectedRows[1].developMode = 'HISTORY'
+  handleDiff(state.selectedRows[0], state.selectedRows[1], false)
 }
 
 /**
- * 数据比对（原 handleDiff：组装 changeJobProjectCode/changeSheetJobReferContentObject/
- * changeSheetJobContentObject 后打开 IssueJobsProcessDetailDisplay 弹窗，
- * isRecover=true 时 diffType='history'）
- * 已迁移 DevelopProjectEnviSelectModal：以 sourceRecord 为比对源记录打开环境选择，
- * 确定后由组件调 GET /dynamic/table/data/fetchByIdWithEnvi 取目标环境数据，
- * 暂提示「比对结果展示组件待迁移」（展示组件属 B 组未迁移，参数组装逻辑已在组件内保留）
+ * 数据比对（原 handleDiff 照搬：组装比对对象后直接打开 IssueJobsProcessDetailDisplay，不经环境选择弹窗）：
+ * obj = {
+ *   changeJobProjectCode: 页面级 tableName（原 route.params.tableName）
+ *   changeSheetJobReferContentObject: sourceRecord（developMode 置 'HISTORY'）
+ *   changeSheetJobContentObject: { dataValueObject: targetRecord }（pkValue 缺省取内层 id）
+ * }
+ * 原 ref 逐属性赋值改为一参传入 edit：srcPk='pkValue'、tarPk='pkValue'、
+ * targetEvni=developEnvi()（与源差异：vuex getter 子应用无该模块，传空串）、
+ * diffType=isRecover ? 'history' : ''、title=LC0783「历史数据对比」
  */
 const handleDiff = (sourceRecord, targetRecord, isRecover) => {
-  openEnviSelect(sourceRecord)
-}
-
-/** 打开比对数据环境选择弹窗（记录需含 id/tableName，历史行缺失时以页面级 tableName 兜底） */
-const openEnviSelect = (record) => {
-  enviSelectRef.value?.edit({ ...record, tableName: record.tableName || state.tableName })
+  const obj = {}
+  obj.changeJobProjectCode = state.tableName
+  obj.changeSheetJobReferContentObject = sourceRecord
+  obj.changeSheetJobReferContentObject.developMode = 'HISTORY'
+  obj.changeSheetJobContentObject = { dataValueObject: targetRecord }
+  if (obj.changeSheetJobContentObject.pkValue === undefined) {
+    obj.changeSheetJobContentObject.pkValue = obj.changeSheetJobContentObject.dataValueObject.id
+  }
+  if (targetRecord.developMode !== undefined) {
+    obj.changeSheetJobContentObject.developMode = targetRecord.developMode
+  }
+  displayRef.value?.edit(obj, {
+    srcPk: 'pkValue',
+    tarPk: 'pkValue',
+    targetEvni: '',
+    diffType: isRecover ? 'history' : '',
+    title: '历史数据对比' // 原 LC0783
+  })
 }
 
 /** 查看详情（原 handleDetail：detailForm.edit(record, formItem)，title=LC0784 明细详情） */
